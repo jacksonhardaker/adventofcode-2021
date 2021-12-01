@@ -3,7 +3,7 @@ import { <%= func %> } from './<%= func %>';
 
 (async () => {
   const input = await processInput('assets/input.txt', { root: __dirname });
-  const result = <%= func %>(input);
+  const result1 = <%= func %>(input);
 
-  console.log(result);
+  console.log(`part 1: ${result1}`);
 })();

@@ -1,8 +1,10 @@
 import { <%= func %> } from './<%= func %>';
 
-test('should do something cool', () => {
-  const input = [];
-  const result = <%= func %>(input);
+describe('<%= func %>', () => {
+  test('should return the expected result', () => {
+    const input = [];
+    const result = <%= func %>(input);
 
-  expect(result).toEqual(null);
-})
+    expect(result).toEqual(null);
+  });
+});
