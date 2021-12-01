@@ -5,6 +5,20 @@ export const sonarSweep = (input: number[]) => {
   );
 };
 
+const getWindow = (index: number, input: number[]) =>
+  input[index] + input[index + 1] + input[index + 2];
+
 export const slidingWindow = (input: number[]) => {
-  return 0;
-}
+  let increaseCount = 0;
+  for (let i = 0; i < input.length - 3; i++) {
+    const currentWindow = getWindow(i, input);
+    const nextWindow = getWindow(i + 1, input);
+
+    if (Number.isNaN(currentWindow) || Number.isNaN(nextWindow)) break;
+
+    if (nextWindow > currentWindow) {
+      increaseCount++;
+    }
+  }
+  return increaseCount;
+};
