@@ -4,3 +4,7 @@ export const sonarSweep = (input: number[]) => {
     0
   );
 };
+
+export const slidingWindow = (input: number[]) => {
+  return 0;
+}

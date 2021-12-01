@@ -1,19 +1,15 @@
-import { sonarSweep } from './sonarSweep';
+import { sonarSweep, slidingWindow } from './sonarSweep';
 
-test('should do something cool', () => {
-  const input = [
-    199,
-    200,
-    208,
-    210,
-    200,
-    207,
-    240,
-    269,
-    260,
-    263,
-  ];
-  const result = sonarSweep(input);
+const input = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
 
-  expect(result).toEqual(7);
+describe('sonarSweep', () => {
+  test('should return the expected result', () => {
+    expect(sonarSweep(input)).toEqual(7);
+  });
+});
+
+describe('slidingWindow', () => {
+  test('should return the expected result', () => {
+    expect(slidingWindow(input)).toEqual(5);
+  });
 });
