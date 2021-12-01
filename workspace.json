@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "day-1": "apps/day-1",
     "util-io": "libs/util-io",
     "warmup-1": "apps/warmup-1"
   }
