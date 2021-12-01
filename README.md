@@ -4,6 +4,10 @@
 
 TypeScript / nx / node / jest
 
+## Solutions
+
+Solutions to each day completed can be found in the [`solutions`](https://github.com/jacksonhardaker/adventofcode-2021/tree/solutions) branch
+
 ## Setup
 
 This repo uses `nx` as a build framework to easily spin up a project for each day
