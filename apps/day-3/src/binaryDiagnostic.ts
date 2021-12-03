@@ -48,22 +48,34 @@ export const binaryDiagnostic = (input: string[]) => {
 };
 
 export const oxygenDiagnostic = (input: string[]) => {
-  const stats = createBitMap(input);
-
-  const bitPositions = Object.values(stats);
   
   let oxygenRatingList = [...input];
   let co2RatingList = [...input];
-  for (let i = 0; i < bitPositions.length; i++) {
+  for (let i = 0; i < input[0].length; i++) {
+    // calculate most/least common bit at position i
+    const { 0: oxZeros, 1: oxOnes} = oxygenRatingList.reduce((acc, binary) => {
+      acc[binary[i]]++
+      return acc;
+    }, { 0: 0, 1: 0});
+
+    const { 0: coZeros, 1: coOnes } = co2RatingList.reduce((acc, binary) => {
+      acc[binary[i]]++
+      return acc;
+    }, { 0: 0, 1: 0});
+
+    const oxGammaRate = oxZeros > oxOnes ? '0' : '1';
+    const coEpsilonRate = coZeros <= coOnes ? '0' : '1';
+
+    
     if (oxygenRatingList.length > 1) {
       oxygenRatingList = oxygenRatingList.filter(
-        (binary) => binary[i] === bitPositions[i].gammaRate
+        (binary) => binary[i] === oxGammaRate
       );
     }
 
     if (co2RatingList.length > 1) {
       co2RatingList = co2RatingList.filter(
-        (binary) => binary[i] === bitPositions[i].epsilonRate
+        (binary) => binary[i] === coEpsilonRate
       );
     }
 
@@ -74,9 +86,6 @@ export const oxygenDiagnostic = (input: string[]) => {
 
   const [oxygenRating] = oxygenRatingList;
   const [co2Rating] = co2RatingList;
-
-  console.log({ oxygenRating, co2Rating});
-
 
   return Number.parseInt(oxygenRating, 2) * Number.parseInt(co2Rating, 2);
 };
