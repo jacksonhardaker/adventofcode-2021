@@ -47,45 +47,35 @@ export const binaryDiagnostic = (input: string[]) => {
   return gammaRate * epsilonRate;
 };
 
-export const oxygenDiagnostic = (input: string[]) => {
-  
-  let oxygenRatingList = [...input];
-  let co2RatingList = [...input];
-  for (let i = 0; i < input[0].length; i++) {
-    // calculate most/least common bit at position i
-    const { 0: oxZeros, 1: oxOnes} = oxygenRatingList.reduce((acc, binary) => {
-      acc[binary[i]]++
-      return acc;
-    }, { 0: 0, 1: 0});
+const reduceBy = (input: string[], criteria: 'gamma' | 'epsilon') => {
+  const rateByCriteria = {
+    gamma: (zeros, ones) => (zeros > ones ? '0' : '1'),
+    epsilon: (zeros, ones) => (zeros <= ones ? '0' : '1'),
+  };
 
-    const { 0: coZeros, 1: coOnes } = co2RatingList.reduce((acc, binary) => {
-      acc[binary[i]]++
-      return acc;
-    }, { 0: 0, 1: 0});
+  let inputClone = [...input];
+  for (let i = 0; i < inputClone[0].length; i++) {
+    if (inputClone.length === 1) break;
 
-    const oxGammaRate = oxZeros > oxOnes ? '0' : '1';
-    const coEpsilonRate = coZeros <= coOnes ? '0' : '1';
+    const { 0: zeros, 1: ones } = inputClone.reduce(
+      (acc, binary) => {
+        acc[binary[i]]++;
+        return acc;
+      },
+      { 0: 0, 1: 0 }
+    );
 
-    
-    if (oxygenRatingList.length > 1) {
-      oxygenRatingList = oxygenRatingList.filter(
-        (binary) => binary[i] === oxGammaRate
-      );
-    }
-
-    if (co2RatingList.length > 1) {
-      co2RatingList = co2RatingList.filter(
-        (binary) => binary[i] === coEpsilonRate
-      );
-    }
-
-    if (oxygenRatingList.length === 1 && co2RatingList.length === 1) {
-      break;
-    }
+    inputClone = inputClone.filter(
+      (binary) => binary[i] === rateByCriteria[criteria](zeros, ones)
+    );
   }
 
-  const [oxygenRating] = oxygenRatingList;
-  const [co2Rating] = co2RatingList;
+  return Number.parseInt(inputClone[0], 2);
+};
 
-  return Number.parseInt(oxygenRating, 2) * Number.parseInt(co2Rating, 2);
+export const oxygenDiagnostic = (input: string[]) => {
+  const oxygenRating = reduceBy(input, 'gamma');
+  const co2Rating = reduceBy(input, 'epsilon');
+
+  return oxygenRating * co2Rating;
 };
