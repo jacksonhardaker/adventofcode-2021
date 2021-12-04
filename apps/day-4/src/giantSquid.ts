@@ -57,3 +57,25 @@ export const giantSquid = (input: string) => {
 
   return sumOfUncalled * lastNumber;
 };
+
+export const letTheSquidWin = (input: string) => {
+  const [numbers, boards] = parseInput(input);
+
+  let [winningBoard, calledNumbers] = findWinningBoard(numbers, boards);
+  let remainingBoards = boards.filter((board) => board !== winningBoard);
+  while(remainingBoards.length >= 1) {
+    [winningBoard, calledNumbers] = findWinningBoard(numbers, remainingBoards);
+    remainingBoards = remainingBoards.filter((board) => board !== winningBoard);
+  };
+
+  const lastNumber: number = Array.from(calledNumbers.keys()).pop();
+
+  const sumOfUncalled = winningBoard.reduce((sum, row) => {
+    row.forEach((num) => {
+      sum = calledNumbers.get(num) ? sum : sum + num;
+    });
+    return sum;
+  }, 0);
+
+  return sumOfUncalled * lastNumber;
+};

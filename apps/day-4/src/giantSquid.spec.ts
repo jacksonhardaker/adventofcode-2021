@@ -1,4 +1,4 @@
-import { giantSquid, parseInput } from './giantSquid';
+import { giantSquid, letTheSquidWin, parseInput } from './giantSquid';
 const input = `7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
 22 13 17 11  0
@@ -58,5 +58,13 @@ describe('giantSquid', () => {
     const result = giantSquid(input);
 
     expect(result).toEqual(4512);
+  });
+});
+
+describe('letTheSquidWin', () => {
+  test('should return the expected result', () => {
+    const result = letTheSquidWin(input);
+
+    expect(result).toEqual(1924);
   });
 });
