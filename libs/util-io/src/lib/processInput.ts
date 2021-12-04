@@ -36,11 +36,3 @@ async function processInput<T = string>(
 }
 
 export { processInput };
-// function fetchBoth(id: number, representation: 'mini'): MiniUser
-// function fetchBoth(id: number, representation: 'full'): FullUser
-// function fetchBoth(id: number, representation: 'mini' | 'full') {
-//     if (representation==='mini')
-//         return { name: 'Mini' }
-//     if (representation==='full')
-//         return { firstName: 'Full', lastName: 'User', age: 20 }
-// }
