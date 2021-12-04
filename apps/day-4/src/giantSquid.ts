@@ -1,5 +1,6 @@
 type Row = number[];
 type Board = Row[];
+type CalledNumbers = Map<number, boolean>;
 
 export const parseInput = (input: string) => {
   const [orderString, ...rest] = input.split('\n');
@@ -15,7 +16,12 @@ export const parseInput = (input: string) => {
   return [numbers, boards] as [number[], Board[]];
 };
 
-const findWinningBoard = (numbers: number[], boards: Board[]) => {
+const findWinningBoards = (
+  numbers: number[],
+  boards: Board[],
+  breakOnFirstWin = true
+): [Board[], CalledNumbers] => {
+  const winningBoards = [];
   const calledNumbers = new Map();
 
   for (const number of numbers) {
@@ -26,7 +32,9 @@ const findWinningBoard = (numbers: number[], boards: Board[]) => {
         const isWinningRow = row.every((num) => calledNumbers.get(num));
 
         if (isWinningRow) {
-          return [board, calledNumbers] as [Board, Map<number, boolean>];
+          !winningBoards.includes(board) && winningBoards.push(board);
+          if (breakOnFirstWin || winningBoards.length === boards.length)
+            return [winningBoards, calledNumbers];
         }
       }
 
@@ -34,48 +42,42 @@ const findWinningBoard = (numbers: number[], boards: Board[]) => {
         const isWinningCol = board.every((row) => calledNumbers.get(row[col]));
 
         if (isWinningCol) {
-          return [board, calledNumbers] as [Board, Map<number, boolean>];
+          !winningBoards.includes(board) && winningBoards.push(board);
+          if (breakOnFirstWin || winningBoards.length === boards.length)
+            return [winningBoards, calledNumbers];
         }
       }
     }
   }
+
+  return [winningBoards, calledNumbers];
 };
 
-export const giantSquid = (input: string) => {
-  const [numbers, boards] = parseInput(input);
-
-  const [winningBoard, calledNumbers] = findWinningBoard(numbers, boards);
-
-  const lastNumber: number = Array.from(calledNumbers.keys()).pop();
-
-  const sumOfUncalled = winningBoard.reduce((sum, row) => {
+const sumOfUncalled = (board: Board, calledNumbers: CalledNumbers): number =>
+  board.reduce((sum, row) => {
     row.forEach((num) => {
       sum = calledNumbers.get(num) ? sum : sum + num;
     });
     return sum;
   }, 0);
 
-  return sumOfUncalled * lastNumber;
+const popNumber = (calledNumbers: CalledNumbers): number =>
+  Array.from(calledNumbers.keys()).pop();
+
+export const giantSquid = (input: string) => {
+  const [numbers, boards] = parseInput(input);
+  const [[winningBoard], calledNumbers] = findWinningBoards(numbers, boards);
+  return sumOfUncalled(winningBoard, calledNumbers) * popNumber(calledNumbers);
 };
 
 export const letTheSquidWin = (input: string) => {
   const [numbers, boards] = parseInput(input);
-
-  let [winningBoard, calledNumbers] = findWinningBoard(numbers, boards);
-  let remainingBoards = boards.filter((board) => board !== winningBoard);
-  while(remainingBoards.length >= 1) {
-    [winningBoard, calledNumbers] = findWinningBoard(numbers, remainingBoards);
-    remainingBoards = remainingBoards.filter((board) => board !== winningBoard);
-  };
-
-  const lastNumber: number = Array.from(calledNumbers.keys()).pop();
-
-  const sumOfUncalled = winningBoard.reduce((sum, row) => {
-    row.forEach((num) => {
-      sum = calledNumbers.get(num) ? sum : sum + num;
-    });
-    return sum;
-  }, 0);
-
-  return sumOfUncalled * lastNumber;
+  const [winningBoards, calledNumbers] = findWinningBoards(
+    numbers,
+    boards,
+    false
+  );
+  return (
+    sumOfUncalled(winningBoards.pop(), calledNumbers) * popNumber(calledNumbers)
+  );
 };
