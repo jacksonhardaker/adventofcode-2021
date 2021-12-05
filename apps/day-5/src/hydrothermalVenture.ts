@@ -14,7 +14,31 @@ const parseInput = (input: string[]): Coords[] => {
   });
 };
 
-export const hydrothermalVenture = (input: string[]) => {
+const logVents = (vents) => {
+  const drawing = Array(10)
+    .fill(0)
+    .map(() => []);
+
+  for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
+      if (!Array.isArray(drawing[i])) {
+        drawing[i] = Array(10).fill('.');
+      }
+      drawing[i][j] = vents?.[i]?.[j] || '.';
+    }
+  }
+
+  console.log(drawing.map((row) => row.join(' ')).join('\n'));
+};
+
+const logCoords = (x1, x2, y1, y2) => {
+  console.log(`${x1},${y1} -> ${x2},${y2}`);
+};
+
+export const hydrothermalVenture = (
+  input: string[],
+  considerDiagonals = false
+) => {
   const vents = [];
   const intersections = new Map();
 
@@ -22,24 +46,36 @@ export const hydrothermalVenture = (input: string[]) => {
     delta === 1 ? index <= end : index >= end;
 
   parseInput(input).forEach(({ x1, y1, x2, y2 }) => {
-    const xDelta = x1 < x2 ? 1 : -1;
-    const yDelta = y1 < y2 ? 1 : -1;
+    const xDelta = x1 === x2 ? 0 : x1 < x2 ? 1 : -1;
+    const yDelta = y1 === y2 ? 0 : y1 < y2 ? 1 : -1;
 
-    if (x1 === x2 || y1 === y2) {
-      for (let x = x1; deltaCondition(x, x2, xDelta); x += xDelta) {
-        for (let y = y1; deltaCondition(y, y2, yDelta); y += yDelta) {
-          if (!Array.isArray(vents[y])) {
-            vents[y] = [];
-          }
+    const isHorizontalOrVertical = x1 === x2 || y1 === y2;
+    const is45Degrees = Math.abs(x1 - x2) === Math.abs(y1 - y2);
+    const shouldProccess = considerDiagonals
+      ? isHorizontalOrVertical || is45Degrees
+      : isHorizontalOrVertical;
 
-          if (vents[y][x]) {
-            vents[y][x]++;
-            intersections.set(`${x},${y}`, true);
-          } else {
-            vents[y][x] = 1;
-          }
+    if (shouldProccess) {
+      let x = x1;
+      let y = y1;
+      while (deltaCondition(x, x2, xDelta) && deltaCondition(y, y2, yDelta)) {
+        if (!Array.isArray(vents[y])) {
+          vents[y] = [];
         }
+
+        if (vents[y][x]) {
+          vents[y][x]++;
+          intersections.set(`${x},${y}`, true);
+        } else {
+          vents[y][x] = 1;
+        }
+
+        x += xDelta;
+        y += yDelta;
       }
+
+      // logCoords(x1, x2, y1, y2);
+      // logVents(vents);
     }
   });
 
