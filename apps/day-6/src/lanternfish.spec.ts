@@ -1,10 +1,18 @@
 import { lanternfish } from './lanternfish';
 
 describe('lanternfish', () => {
-  test('should return the expected result', () => {
-    const input = [];
-    const result = lanternfish(input);
+  const input = [3, 4, 3, 1, 2];
 
-    expect(result).toEqual(null);
-  });
+  test.each([
+    [0, 5, input],
+    [1, 5, input],
+    [12, 17, input],
+    [18, 26, input],
+    [80, 5934, input],
+  ])(
+    'after %i days should return %i fish with the given input',
+    (days, expected, input) => {
+      expect(lanternfish(input, days)).toEqual(expected);
+    }
+  );
 });
