@@ -9,6 +9,7 @@ describe('lanternfish', () => {
     [12, 17, input],
     [18, 26, input],
     [80, 5934, input],
+    [256, 26984457539, input],
   ])(
     'after %i days should return %i fish with the given input',
     (days, expected, input) => {

@@ -8,6 +8,8 @@ import { lanternfish } from './lanternfish';
     parser: Number,
   });
   const result1 = lanternfish(input, 80);
+  const result2 = lanternfish(input, 256);
 
   console.log(`part 1: ${result1}`);
+  console.log(`part 2: ${result2}`);
 })();
