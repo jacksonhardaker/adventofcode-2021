@@ -8,6 +8,8 @@ import { whaleTreachery } from './whaleTreachery';
     delimiter: ',',
   });
   const result1 = whaleTreachery(input);
+  const result2 = whaleTreachery(input, false);
 
   console.log(`part 1: ${result1}`);
+  console.log(`part 2: ${result2}`);
 })();
