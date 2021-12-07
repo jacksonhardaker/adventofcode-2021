@@ -1,24 +1,29 @@
-type CrabAggregate = Record<number, number>;
+type HorizontalPosition = number;
+type SubmarineCount = number;
+type CrabAggregate = [HorizontalPosition, SubmarineCount];
+type CrabAggregateHash = Record<HorizontalPosition, CrabAggregate>;
 
 export const whaleTreachery = (input: number[], constantFuelUsage = true) => {
-  const aggregate = input.reduce(
+  const aggregateHash = input.reduce(
     (acc, position) => ({
       ...acc,
-      [position]: acc[position] ? acc[position] + 1 : 1,
+      [position]: [position, acc[position] ? acc[position][1] + 1 : 1],
     }),
-    {} as CrabAggregate
+    {} as CrabAggregateHash
   );
 
-  const uniqueHorizontalPositions = Object.keys(aggregate).map(Number);
+  const aggregate = Object.values(aggregateHash);
+
+  const uniqueHorizontalPositions = aggregate.map(([p]) => p);
   const largestPosition = Math.max(...uniqueHorizontalPositions);
   const smallestPosition = Math.min(...uniqueHorizontalPositions);
 
   let minfuel = Infinity;
   for (let i = smallestPosition; i <= largestPosition; i++) {
-    const fuelUsed = Object.entries(aggregate).reduce(
+    const fuelUsed = aggregate.reduce(
       (fuelUsed, [position, submarineCount]) => {
-        if (+position !== i) {
-          const delta = Math.abs(+position - i);
+        if (position !== i) {
+          const delta = Math.abs(position - i);
           if (constantFuelUsage) {
             return fuelUsed + delta * submarineCount;
           } else {
@@ -37,5 +42,6 @@ export const whaleTreachery = (input: number[], constantFuelUsage = true) => {
 
     minfuel = Math.min(minfuel, fuelUsed);
   }
+
   return minfuel;
 };
