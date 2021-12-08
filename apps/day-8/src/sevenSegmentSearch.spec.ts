@@ -21,7 +21,7 @@ describe('sevenSegmentSearch', () => {
 });
 
 describe('sevenSegmentSearch', () => {
-  test.only('should return the sum of the values determined by the given pattern', () => {
+  test('should return the sum of the values determined by the given pattern', () => {
     const input = [
       'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf'
     ];
