@@ -91,6 +91,8 @@ export const part2 = (input: string[]) => {
       })
       .join('');
 
+    console.log(Number(value));
+
     return (sum += Number(value));
   }, 0);
 

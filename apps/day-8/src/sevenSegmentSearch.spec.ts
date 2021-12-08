@@ -23,11 +23,29 @@ describe('sevenSegmentSearch', () => {
 describe('sevenSegmentSearch', () => {
   test('should return the sum of the values determined by the given pattern', () => {
     const input = [
-      'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf'
+      'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf',
     ];
     const result = part2(input);
 
     expect(result).toEqual(5353);
+  });
+
+  test.only('should return the sum of the values determined by the given pattern', () => {
+    const input = [
+      'dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe',
+    ];
+    const result = part2(input);
+
+    expect(result).toEqual(4548);
+  });
+
+  test.only('should return the sum of the values determined by the given pattern', () => {
+    const input = [
+      'gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce',
+    ];
+    const result = part2(input);
+
+    expect(result).toEqual(4315);
   });
 
   test('should return the number of digits with unique numbers of segments', () => {
