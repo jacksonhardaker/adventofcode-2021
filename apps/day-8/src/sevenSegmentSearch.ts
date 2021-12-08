@@ -51,7 +51,7 @@ export const part2 = (input: string[]) => {
         hasLength(p, 6) &&
         !equals(p, nine) &&
         patterns
-          .filter((p2) => p2.length === 5)
+          .filter((p2) => hasLength(p2, 5))
           .every((p3) =>
             p3.includes(Array.from(nine).find((c) => !p.includes(c)))
           )
@@ -64,10 +64,7 @@ export const part2 = (input: string[]) => {
 
     // if 5 chars AND 9 includes all chars AND is not 3 === 5
     const five = patterns.find(
-      (p) =>
-        hasLength(p, 5) &&
-        Array.from(p).every((c) => nine.includes(c)) &&
-        !equals(p, three)
+      (p) => hasLength(p, 5) && includesAllFrom(p, nine) && !equals(p, three)
     );
 
     // if 5 chars AND is NOT 3 or 5 === 2
