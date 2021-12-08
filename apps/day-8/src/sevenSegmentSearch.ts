@@ -85,12 +85,14 @@ export const part2 = (input: string[]) => {
       nine,
     ];
 
-    const value = values
-      .map((value) => {
-        return numbers.findIndex((p) => equals(p, value));
-      })
-      .join('');
+    const value = Number(
+      values
+        .map((value) => {
+          return numbers.findIndex((p) => equals(p, value));
+        })
+        .join('')
+    );
 
-    return (sum += Number(value));
+    return (sum += value);
   }, 0);
 };
