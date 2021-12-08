@@ -30,7 +30,7 @@ describe('sevenSegmentSearch', () => {
     expect(result).toEqual(5353);
   });
 
-  test.only('should return the sum of the values determined by the given pattern', () => {
+  test('should return the sum of the values determined by the given pattern', () => {
     const input = [
       'dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe',
     ];
@@ -39,7 +39,7 @@ describe('sevenSegmentSearch', () => {
     expect(result).toEqual(4548);
   });
 
-  test.only('should return the sum of the values determined by the given pattern', () => {
+  test('should return the sum of the values determined by the given pattern', () => {
     const input = [
       'gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce',
     ];

@@ -62,9 +62,12 @@ export const part2 = (input: string[]) => {
       (p) => hasLength(p, 6) && !equals(p, nine) && !equals(p, zero)
     );
 
-    // if 5 chars AND 9 includes all chars === 5
+    // if 5 chars AND 9 includes all chars AND is not 3 === 5
     const five = patterns.find(
-      (p) => hasLength(p, 5) && Array.from(p).every((c) => nine.includes(c))
+      (p) =>
+        hasLength(p, 5) &&
+        Array.from(p).every((c) => nine.includes(c)) &&
+        !equals(p, three)
     );
 
     // if 5 chars AND is NOT 3 or 5 === 2
@@ -91,10 +94,6 @@ export const part2 = (input: string[]) => {
       })
       .join('');
 
-    console.log(Number(value));
-
     return (sum += Number(value));
   }, 0);
-
-  // return Number(value);
 };
