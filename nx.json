@@ -29,5 +29,18 @@
       }
     ]
   },
-  "defaultProject": "warmup-1"
+  "defaultProject": "warmup-1",
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "babel": true
+      }
+    },
+    "@nrwl/next": {
+      "application": {
+        "style": "styled-jsx",
+        "linter": "eslint"
+      }
+    }
+  }
 }
