@@ -23,27 +23,25 @@ export const smokeBasin = (input: number[][]) => {
 };
 
 export const part2 = (input: number[][]) => {
-  const lowPoints = findLowPoints(input);
-
-  const traverse = (x, y, visited = {}) => {
-    const point = input?.[y]?.[x];
+  const traverse = (x: number, y: number, visited = {}) => {
     visited[`${x},${y}`] = true;
 
-    const visit = (x2, y2) =>
+    const visit = ([x2, y2]: [number, number]) =>
       visited[`${x2},${y2}`] ? 0 : traverse(x2, y2, visited);
 
-    if (point === 9 || point === undefined) return 0;
+    if ([9, undefined].includes(input?.[y]?.[x])) return 0;
 
-    return (
-      1 + visit(x - 1, y) + visit(x + 1, y) + visit(x, y - 1) + visit(x, y + 1)
-    );
+    return ([
+      [x - 1, y],
+      [x + 1, y],
+      [x, y - 1],
+      [x, y + 1],
+    ] as [number, number][]).reduce((acc, coords) => acc + visit(coords), 1);
   };
 
-  const basinSizes = lowPoints.map(([x, y]) => traverse(x, y));
-  const productOf3Largest = basinSizes
+  return findLowPoints(input)
+    .map(([x, y]) => traverse(x, y))
     .sort((a, b) => (a === b ? 0 : a > b ? 1 : -1))
     .slice(-3)
     .reduce((acc, size) => acc * size, 1);
-
-  return productOf3Largest;
 };
