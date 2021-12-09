@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
-import { data as input } from '../public/input';
+/* eslint-disable @next/next/no-page-custom-font */
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
+// import { data as input } from '../public/input';
 
-// const input = [
-//   [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
-//   [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
-//   [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
-//   [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
-//   [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
-// ];
+const input = [
+  [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
+  [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
+  [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
+  [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
+  [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
+];
 
 const Cell = ({
   value,
@@ -42,24 +44,43 @@ const useLowPoints = (input: number[][]) => {
   const [lowPoints, setLowPoints] = useState([]);
 
   useEffect(() => {
-    let timeoutInterval = 1000;
-    for (let y = 0; y < input.length; y++) {
-      for (let x = 0; x < input[y].length; x++) {
-        const surrounding = [
-          [y - 1, x],
-          [y + 1, x],
-          [y, x - 1],
-          [y, x + 1],
-        ].map(([yy, xx]) => input?.[yy]?.[xx] ?? Infinity);
+    (async () => {
+      const lowPoints = [];
+      for (let y = 0; y < input.length; y++) {
+        for (let x = 0; x < input[y].length; x++) {
+          const surrounding = [
+            [y - 1, x],
+            [y + 1, x],
+            [y, x - 1],
+            [y, x + 1],
+          ].map(([yy, xx]) => input?.[yy]?.[xx] ?? Infinity);
 
-        if (surrounding.every((point) => input[y][x] < point)) {
-          setTimeout(() => {
-            setLowPoints((points) => [...points, [x, y]]);
-          }, timeoutInterval);
-          timeoutInterval += 1000;
+          if (surrounding.every((point) => input[y][x] < point)) {
+            lowPoints.push([x, y]);
+          }
         }
       }
-    }
+
+      function* iterate(index) {
+        while (index < lowPoints.length) {
+          yield new Promise<void>((resolve) => {
+            setTimeout(() => {
+              setLowPoints((points) => [...points, lowPoints[index]]);
+              resolve();
+            }, 100);
+          });
+          index++;
+        }
+      }
+
+      const iterator = iterate(0);
+
+      let iteration = iterator.next();
+      while (!iteration.done) {
+        await iteration.value;
+        iteration = iterator.next();
+      }
+    })();
   }, [input]);
 
   return lowPoints;
@@ -68,30 +89,53 @@ const useLowPoints = (input: number[][]) => {
 const useSmokeBasin = (lowPoints: [number, number][]) => {
   const [basinCells, setBasinCells] = useState([]);
   useEffect(() => {
-    const traverse = async (x: number, y: number, visited = {}) => {
-      visited[`${x},${y}`] = true;
-  
-      if ([9, undefined].includes(input?.[y]?.[x])) return null;
-  
-      setBasinCells((b) => [...b, [x, y]]);
-  
-      const visit = ([x2, y2]: [number, number]) => {
-        if (!visited[`${x2},${y2}`]) {
-          traverse(x2, y2, visited);
-        }
+    (async () => {
+      const basinCells = [];
+      const traverse = (x: number, y: number, visited = {}) => {
+        visited[`${x},${y}`] = true;
+
+        if ([9, undefined].includes(input?.[y]?.[x])) return null;
+
+        basinCells.push([x, y]);
+
+        const visit = ([x2, y2]: [number, number]) => {
+          if (!visited[`${x2},${y2}`]) {
+            traverse(x2, y2, visited);
+          }
+        };
+
+        (
+          [
+            [x - 1, y],
+            [x + 1, y],
+            [x, y - 1],
+            [x, y + 1],
+          ] as [number, number][]
+        ).forEach((coords) => visit(coords), 1);
       };
-  
-      (
-        [
-          [x - 1, y],
-          [x + 1, y],
-          [x, y - 1],
-          [x, y + 1],
-        ] as [number, number][]
-      ).forEach((coords) => visit(coords), 1);
-    };
-  
-    lowPoints.map(([x, y]) => traverse(x, y));
+
+      lowPoints.forEach(([x, y]) => traverse(x, y));
+
+      function* iterate(index) {
+        while (index < basinCells.length) {
+          yield new Promise<void>((resolve) => {
+            setTimeout(() => {
+              setBasinCells((cells) => [...cells, basinCells[index]]);
+              resolve();
+            }, 100);
+          });
+          index++;
+        }
+      }
+
+      const iterator = iterate(0);
+
+      let iteration = iterator.next();
+      while (!iteration.done) {
+        await iteration.value;
+        iteration = iterator.next();
+      }
+    })();
   }, [lowPoints]);
 
   return basinCells;
@@ -99,7 +143,7 @@ const useSmokeBasin = (lowPoints: [number, number][]) => {
 
 const Grid = ({
   input,
-  cellSize = '30px',
+  cellSize = '50px',
 }: {
   input: number[][];
   cellSize?: `${number}px`;
@@ -133,7 +177,24 @@ const Grid = ({
 export function Index() {
   return (
     <div>
-      <style jsx>{``}</style>
+      <style jsx>{`
+        div {
+          font-family: 'Space Mono', monospace;
+          font-size: 1.5rem;
+        }
+      `}</style>
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <Grid input={input} />
     </div>
   );
