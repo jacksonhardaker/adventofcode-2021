@@ -2,9 +2,20 @@ import { syntaxScoring } from './syntaxScoring';
 
 describe('syntaxScoring', () => {
   test('should return the expected result', () => {
-    const input = [];
+    const input = [
+      '[({(<(())[]>[[{[]{<()<>>',
+      '[(()[<>])]({[<{<<[]>>(',
+      '{([(<{}[<>[]}>{[]{[(<()>',
+      '(((({<>}<{<{<>}{[]{[]{}',
+      '[[<[([]))<([[{}[[()]]]',
+      '[{[{({}]{}}([{[{{{}}([]',
+      '{<[[]]>}<{[{[{[]{()[[[]',
+      '[<(<(<(<{}))><([]([]()',
+      '<{([([[(<>()){}]>(<<{{',
+      '<{([{{}}[<[[[<>{}]]]>[]]',
+    ];
     const result = syntaxScoring(input);
 
-    expect(result).toEqual(null);
+    expect(result).toEqual(26397);
   });
 });
