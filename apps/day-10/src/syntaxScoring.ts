@@ -36,23 +36,22 @@ export const part2 = (input: string[]) => {
     '>': 4,
   };
 
-  const incomplete = input.reduce((acc, line) => {
-    const stack: string[] = [];
-    for (const symbol of line) {
-      if (symbol.match(/[([{<]/)) {
-        stack.push(symbol);
-      } else if (PAIRS[stack.pop()] !== symbol) {
-        return acc;
+  const scores = input
+    .reduce((acc, line) => {
+      const stack: string[] = [];
+      for (const symbol of line) {
+        if (symbol.match(/[([{<]/)) {
+          stack.push(symbol);
+        } else if (PAIRS[stack.pop()] !== symbol) {
+          return acc;
+        }
       }
-    }
-    return [...acc, stack];
-  }, []);
-
-  const scores = incomplete
-    .map((symbols) =>
-      symbols.reduceRight((acc, symbol) => acc * 5 + POINTS[PAIRS[symbol]], 0)
-    )
+      return [
+        ...acc,
+        stack.reduceRight((acc, symbol) => acc * 5 + POINTS[PAIRS[symbol]], 0),
+      ];
+    }, [])
     .sort((a, b) => (a === b ? 0 : a > b ? 1 : -1));
 
-  return scores[Math.floor(scores.length / 2)]
+  return scores[Math.floor(scores.length / 2)];
 };
