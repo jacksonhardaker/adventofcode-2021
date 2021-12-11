@@ -1,6 +1,7 @@
 export const takeSteps = (input: number[][], steps: number) => {
   const octopuses = [...input];
   let flashCount = 0;
+  let allFlashed = false;
   // find 9s
   const takeStep = () => {
     const hasFlashed = {};
@@ -46,6 +47,12 @@ export const takeSteps = (input: number[][], steps: number) => {
       }
     }
 
+
+
+    if (Object.keys(hasFlashed).length === octopuses.length * octopuses[0].length) {
+      allFlashed = true;
+    }
+
     flashCount += Object.keys(hasFlashed).length;
   };
 
@@ -53,7 +60,7 @@ export const takeSteps = (input: number[][], steps: number) => {
     takeStep();
   }
 
-  return { octopuses, flashCount };
+  return { octopuses, flashCount, allFlashed };
 };
 
 export const dumbOctopus = (input: number[][], steps = 100) => {
@@ -62,3 +69,15 @@ export const dumbOctopus = (input: number[][], steps = 100) => {
   
   return flashCount;
 };
+
+export const dumbOctopusSync = (input: number[][]) => {
+  
+  let results = takeSteps(input, 1);
+  let stepsTaken = 1;
+  while(!results.allFlashed) {
+    results = takeSteps(results.octopuses, 1);
+    stepsTaken++;
+  }
+
+  return stepsTaken;
+}

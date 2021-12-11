@@ -1,4 +1,4 @@
-import { dumbOctopus, takeSteps } from './dumbOctopus';
+import { dumbOctopus, dumbOctopusSync, takeSteps } from './dumbOctopus';
 
 describe('takeSteps', () => {
   test('should return the expected octopus grid after 1 step', () => {
@@ -120,6 +120,36 @@ describe('takeSteps', () => {
       [0, 0, 3, 2, 2, 4, 0, 0, 0, 0],
     ]);
   });
+
+  test('should return the expected octopus grid after 193 steps', () => {
+    const { octopuses } = takeSteps(
+      [
+        [5, 4, 8, 3, 1, 4, 3, 2, 2, 3],
+        [2, 7, 4, 5, 8, 5, 4, 7, 1, 1],
+        [5, 2, 6, 4, 5, 5, 6, 1, 7, 3],
+        [6, 1, 4, 1, 3, 3, 6, 1, 4, 6],
+        [6, 3, 5, 7, 3, 8, 5, 4, 7, 8],
+        [4, 1, 6, 7, 5, 2, 4, 6, 4, 5],
+        [2, 1, 7, 6, 8, 4, 1, 7, 2, 1],
+        [6, 8, 8, 2, 8, 8, 1, 1, 3, 4],
+        [4, 8, 4, 6, 8, 4, 8, 5, 5, 4],
+        [5, 2, 8, 3, 7, 5, 1, 5, 2, 6],
+      ],
+      193
+    );
+    expect(octopuses).toEqual([
+      [5, 8, 7, 7, 7, 7, 7, 7, 7, 7],
+      [8, 8, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+    ]);
+  });
 });
 
 describe('dumbOctopus', () => {
@@ -140,3 +170,23 @@ describe('dumbOctopus', () => {
     expect(result).toEqual(1656);
   });
 });
+
+describe('dumbOctopusSync', () => {
+  test('should return the step in which all octopuses sync', () => {
+    const result = dumbOctopusSync([
+      [5, 4, 8, 3, 1, 4, 3, 2, 2, 3],
+      [2, 7, 4, 5, 8, 5, 4, 7, 1, 1],
+      [5, 2, 6, 4, 5, 5, 6, 1, 7, 3],
+      [6, 1, 4, 1, 3, 3, 6, 1, 4, 6],
+      [6, 3, 5, 7, 3, 8, 5, 4, 7, 8],
+      [4, 1, 6, 7, 5, 2, 4, 6, 4, 5],
+      [2, 1, 7, 6, 8, 4, 1, 7, 2, 1],
+      [6, 8, 8, 2, 8, 8, 1, 1, 3, 4],
+      [4, 8, 4, 6, 8, 4, 8, 5, 5, 4],
+      [5, 2, 8, 3, 7, 5, 1, 5, 2, 6],
+    ]);
+    
+    expect(result).toEqual(195);
+
+  })
+})
