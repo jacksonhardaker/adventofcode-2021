@@ -1,5 +1,5 @@
 export const takeSteps = (input: number[][], steps: number) => {
-  const octopuses = [...input];
+  const octopuses = input.map((row) => [...row]);
   let flashCount = 0;
   let allFlashed = false;
   // find 9s
@@ -19,37 +19,40 @@ export const takeSteps = (input: number[][], steps: number) => {
       }
     }
 
-    while(Object.keys(nines).length > 0) {
-      const justFlashed = {...nines};
+    while (Object.keys(nines).length > 0) {
+      const justFlashed = { ...nines };
       nines = {};
       for (const key in justFlashed) {
-        const [y,x] = justFlashed[key];
+        const [y, x] = justFlashed[key];
         [
-          [y - 1, x -1],
+          [y - 1, x - 1],
           [y - 1, x],
           [y - 1, x + 1],
-          [y, x -1],
+          [y, x - 1],
           [y, x],
           [y, x + 1],
-          [y + 1, x -1],
+          [y + 1, x - 1],
           [y + 1, x],
           [y + 1, x + 1],
-        ].forEach(([y2,x2]) => {
+        ].forEach(([y2, x2]) => {
           if (octopuses?.[y2]?.[x2] === 9) {
             octopuses[y2][x2] = 0;
             hasFlashed[`${y2},${x2}`] = true;
             nines[`${y2},${x2}`] = [y2, x2];
-          }
-          else if (octopuses?.[y2]?.[x2] !== undefined && !hasFlashed[`${y2},${x2}`]) {
+          } else if (
+            octopuses?.[y2]?.[x2] !== undefined &&
+            !hasFlashed[`${y2},${x2}`]
+          ) {
             octopuses[y2][x2]++;
           }
         });
       }
     }
 
-
-
-    if (Object.keys(hasFlashed).length === octopuses.length * octopuses[0].length) {
+    if (
+      Object.keys(hasFlashed).length ===
+      octopuses.length * octopuses[0].length
+    ) {
       allFlashed = true;
     }
 
@@ -64,20 +67,18 @@ export const takeSteps = (input: number[][], steps: number) => {
 };
 
 export const dumbOctopus = (input: number[][], steps = 100) => {
-  
   const { flashCount } = takeSteps(input, steps);
-  
+
   return flashCount;
 };
 
 export const dumbOctopusSync = (input: number[][]) => {
-  
   let results = takeSteps(input, 1);
   let stepsTaken = 1;
-  while(!results.allFlashed) {
+  while (!results.allFlashed) {
     results = takeSteps(results.octopuses, 1);
     stepsTaken++;
   }
 
   return stepsTaken;
-}
+};
