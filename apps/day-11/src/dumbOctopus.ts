@@ -1,12 +1,3 @@
-const surroundingPoints = (y, x) =>
-  Array(3)
-    .fill(0)
-    .flatMap((_, i) =>
-      Array(3)
-        .fill(0)
-        .map((_, j) => [i + y - 1, j + x - 1])
-    );
-
 export const takeSteps = (input: number[][], steps: number) => {
   const octopuses = input.map((row) => [...row]);
   const flashCount = [];
@@ -28,19 +19,26 @@ export const takeSteps = (input: number[][], steps: number) => {
       }
     };
 
-    for (let y = 0; y < octopuses.length; y++) {
-      for (let x = 0; x < octopuses[y].length; x++) {
-        handlePoint(y, x);
+    const forRange = (y1, y2, x1, x2) => {
+      for (let y = y1; y < y2; y++) {
+        for (let x = x1; x < x2; x++) {
+          handlePoint(y, x);
+        }
       }
-    }
+    };
+
+    forRange(0, octopuses.length, 0, octopuses[0].length);
 
     while (Object.keys(flashed).length > 0) {
       const justFlashed = { ...flashed };
       flashed = {};
       for (const key in justFlashed) {
-        surroundingPoints(...justFlashed[key]).forEach(([y2, x2]) => {
-          handlePoint(y2, x2);
-        });
+        forRange(
+          justFlashed[key][0] - 1,
+          justFlashed[key][0] + 2,
+          justFlashed[key][1] - 1,
+          justFlashed[key][1] + 2
+        );
       }
     }
 
