@@ -45,9 +45,7 @@ export const takeSteps = (input: number[][], steps: number) => {
     flashCount.push(Object.keys(hasFlashed).length);
   };
 
-  for (let i = 0; i < steps; i++) {
-    takeStep();
-  }
+  Array(steps).fill(0).forEach(takeStep);
 
   return {
     octopuses,
