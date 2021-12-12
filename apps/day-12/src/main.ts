@@ -5,5 +5,5 @@ import { passagePathing } from './passagePathing';
   const input = await processInput('assets/input.txt', { root: __dirname });
   const result1 = passagePathing(input);
 
-  console.log(`part 1: ${result1}`);
+  console.log(`part 1: ${result1.length}`);
 })();
