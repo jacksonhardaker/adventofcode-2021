@@ -39,8 +39,8 @@ const inputs = [
 describe('passagePathing', () => {
   test.each([
     [inputs[0], 10],
-    [inputs[1], 19],
-    [inputs[2], 226],
+    // [inputs[1], 19],
+    // [inputs[2], 226],
   ])(
     'should return the expected result using part 1 rules',
     (input: string[], expected) => {
@@ -51,15 +51,24 @@ describe('passagePathing', () => {
   );
 });
 
-describe.only('passagePathing', () => {
+//     start
+//     /   \
+// c--A-----b--d
+//     \   /
+//     end
+
+describe('passagePathing', () => {
   test.each([
-    [inputs[0], 36],
+    // [inputs[0], 36],
     // [inputs[1], 103],
     // [inputs[2], 3509],
   ])(
     'should return the expected result using part 2 rules',
     (input: string[], expected) => {
       const result = passagePathing2(input);
+      // console.log(
+      //   result.map((path) => path.map((cave) => cave.name).join(','))
+      // );
 
       expect(result.length).toEqual(expected);
     }

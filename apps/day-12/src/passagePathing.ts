@@ -1,3 +1,11 @@
+class TreeNode {
+  cave: Cave;
+  parent: TreeNode | null;
+  constructor(cave, parent) {
+    this.cave = cave;
+    this.parent = parent;
+  }
+}
 class Cave {
   name: string;
   connections: Map<string, Cave>;
@@ -33,16 +41,17 @@ const traverse =
     const hasVisited = (name) => !!path.find((c) => c.name === name);
 
     if (useExpandedRules) {
-      const isRevisitingStart = cave.name === 'start' && hasVisited('start');
       const hasAlreadyVisitedTwoSmallCaves = path.some(
         (cave, index) => path.indexOf(cave) !== index
       );
 
       if (
-        isRevisitingStart ||
-        (hasAlreadyVisitedTwoSmallCaves && hasVisited(cave.name))
-      )
+        hasAlreadyVisitedTwoSmallCaves &&
+        cave.isSmall &&
+        hasVisited(cave.name)
+      ) {
         return ends;
+      }
     } else {
       if (cave.isSmall && hasVisited(cave.name)) return ends;
     }
@@ -54,14 +63,43 @@ const traverse =
       return ends;
     } else {
       cave.connections.forEach((child) => {
-        traverse(useExpandedRules)(child, [...path], ends);
+        if (child.name !== 'start')
+          traverse(useExpandedRules)(child, [...path], ends);
       });
       return ends;
     }
   };
 
+const traverse2 = (useExpandedRules = false, start: Cave) => {
+  const ends: TreeNode[] = [];
+  const visited = new Map<string, Cave>();
+
+  const step = (cave: Cave, parent: TreeNode) => {
+    const node = new TreeNode(cave, parent);
+    if (cave.name === 'end') return ends.push(node);
+
+    if (useExpandedRules) {
+      console.log('expanded');
+    } else {
+      if (cave.isSmall && visited.get(cave.name)) return;
+    }
+
+    visited.set(cave.name, cave);
+
+    cave.connections.forEach((connection) => {
+      connection.name !== 'start' && step(connection, node);
+    });
+  };
+
+  step(start, null);
+  console.log(ends);
+  return ends;
+};
+
+// export const passagePathing = (input: string[]) =>
+//   traverse()(mapCave(input).get('start'), [], []);
 export const passagePathing = (input: string[]) =>
-  traverse()(mapCave(input).get('start'), [], []);
+  traverse2(false, mapCave(input).get('start'));
 
 export const passagePathing2 = (input: string[]) =>
   traverse(true)(mapCave(input).get('start'), [], []);
