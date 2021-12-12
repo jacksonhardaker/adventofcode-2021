@@ -27,29 +27,41 @@ const mapCave = (input: string[]) =>
     return tree;
   }, new Map<string, Cave>());
 
-const traverse = (cave: Cave, path: Cave[], ends: Cave[][]) => {
-  if (cave.isSmall && path.find((c) => c.name === cave.name)) return;
-  
-  path.push(cave);
+const traverse =
+  (useExpandedRules = false) =>
+  (cave: Cave, path: Cave[], ends: Cave[][]) => {
+    const hasVisited = (name) => !!path.find((c) => c.name === name);
 
-  if (cave.name === 'end') {
-    ends.push(path);
-    return;
-  }
-  else {
-    cave.connections.forEach((child) => {
-      traverse(child, [...path], ends);
-    });
-    return;
-  }
-};
+    if (useExpandedRules) {
+      const isRevisitingStart = cave.name === 'start' && hasVisited('start');
+      const hasAlreadyVisitedTwoSmallCaves = path.some(
+        (cave, index) => path.indexOf(cave) !== index
+      );
 
-export const passagePathing = (input: string[]) => {
-  const caveSystem = mapCave(input);
+      if (
+        isRevisitingStart ||
+        (hasAlreadyVisitedTwoSmallCaves && hasVisited(cave.name))
+      )
+        return ends;
+    } else {
+      if (cave.isSmall && hasVisited(cave.name)) return ends;
+    }
 
-  const start = caveSystem.get('start');
-  const ends = [];
-  traverse(start, [], ends);
+    path.push(cave);
 
-  return ends;
-};
+    if (cave.name === 'end') {
+      ends.push(path);
+      return ends;
+    } else {
+      cave.connections.forEach((child) => {
+        traverse(useExpandedRules)(child, [...path], ends);
+      });
+      return ends;
+    }
+  };
+
+export const passagePathing = (input: string[]) =>
+  traverse()(mapCave(input).get('start'), [], []);
+
+export const passagePathing2 = (input: string[]) =>
+  traverse(true)(mapCave(input).get('start'), [], []);
