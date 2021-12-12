@@ -1,11 +1,3 @@
-class TreeNode {
-  cave: Cave;
-  parent: TreeNode | null;
-  constructor(cave, parent) {
-    this.cave = cave;
-    this.parent = parent;
-  }
-}
 class Cave {
   name: string;
   connections: Map<string, Cave>;
@@ -35,71 +27,38 @@ const mapCave = (input: string[]) =>
     return tree;
   }, new Map<string, Cave>());
 
-const traverse =
-  (useExpandedRules = false) =>
-  (cave: Cave, path: Cave[], ends: Cave[][]) => {
-    const hasVisited = (name) => !!path.find((c) => c.name === name);
+const traverse = (useExpandedRules = false, start: Cave) => {
+  const ends: Cave[][] = [];
 
-    if (useExpandedRules) {
+  const step = (cave: Cave, path: Cave[]) => {
+    if (cave.name === 'end') return ends.push([...path, cave]);
+
+    const hasVisited = (c1) => !!path.find((c2) => c2.name === c1.name);
+
+    const continueAfterApplyingRules = () => {
       const hasAlreadyVisitedTwoSmallCaves = path.some(
         (cave, index) => path.indexOf(cave) !== index
       );
+      const isSmallAndHasBeenVisited = cave.isSmall && hasVisited(cave)
 
-      if (
-        hasAlreadyVisitedTwoSmallCaves &&
-        cave.isSmall &&
-        hasVisited(cave.name)
-      ) {
-        return ends;
-      }
-    } else {
-      if (cave.isSmall && hasVisited(cave.name)) return ends;
-    }
+      return useExpandedRules ? !(hasAlreadyVisitedTwoSmallCaves && isSmallAndHasBeenVisited) : !isSmallAndHasBeenVisited;
+    };
 
-    path.push(cave);
-
-    if (cave.name === 'end') {
-      ends.push(path);
-      return ends;
-    } else {
+    if (continueAfterApplyingRules()) {
+      path.push(cave);
       cave.connections.forEach((child) => {
-        if (child.name !== 'start')
-          traverse(useExpandedRules)(child, [...path], ends);
+        if (child.name !== 'start') step(child, [...path]);
       });
-      return ends;
     }
   };
 
-const traverse2 = (useExpandedRules = false, start: Cave) => {
-  const ends: TreeNode[] = [];
-  const visited = new Map<string, Cave>();
+  step(start, []);
 
-  const step = (cave: Cave, parent: TreeNode) => {
-    const node = new TreeNode(cave, parent);
-    if (cave.name === 'end') return ends.push(node);
-
-    if (useExpandedRules) {
-      console.log('expanded');
-    } else {
-      if (cave.isSmall && visited.get(cave.name)) return;
-    }
-
-    visited.set(cave.name, cave);
-
-    cave.connections.forEach((connection) => {
-      connection.name !== 'start' && step(connection, node);
-    });
-  };
-
-  step(start, null);
-  console.log(ends);
   return ends;
 };
 
-// export const passagePathing = (input: string[]) =>
-//   traverse()(mapCave(input).get('start'), [], []);
 export const passagePathing = (input: string[]) =>
-  traverse2(false, mapCave(input).get('start'));
+  traverse(false, mapCave(input).get('start'));
 
 export const passagePathing2 = (input: string[]) =>
-  traverse(true)(mapCave(input).get('start'), [], []);
+  traverse(true, mapCave(input).get('start'));
