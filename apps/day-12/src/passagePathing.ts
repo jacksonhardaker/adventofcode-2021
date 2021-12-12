@@ -33,21 +33,21 @@ const traverse = (useExpandedRules = false, start: Cave) => {
   const step = (cave: Cave, path: Cave[]) => {
     if (cave.name === 'end') return ends.push([...path, cave]);
 
-    const hasVisited = (c1) => !!path.find((c2) => c2.name === c1.name);
-
     const continueAfterApplyingRules = () => {
       const hasAlreadyVisitedTwoSmallCaves = path.some(
-        (cave, index) => path.indexOf(cave) !== index
+        (cave, index) => cave.isSmall && path.indexOf(cave) !== index
       );
-      const isSmallAndHasBeenVisited = cave.isSmall && hasVisited(cave)
+      const isSmallAndHasBeenVisited =
+        cave.isSmall && !!path.find((c) => c.name === cave.name);
 
-      return useExpandedRules ? !(hasAlreadyVisitedTwoSmallCaves && isSmallAndHasBeenVisited) : !isSmallAndHasBeenVisited;
+      return useExpandedRules
+        ? !(hasAlreadyVisitedTwoSmallCaves && isSmallAndHasBeenVisited)
+        : !isSmallAndHasBeenVisited;
     };
 
     if (continueAfterApplyingRules()) {
-      path.push(cave);
-      cave.connections.forEach((child) => {
-        if (child.name !== 'start') step(child, [...path]);
+      cave.connections.forEach((connection) => {
+        if (connection.name !== 'start') step(connection, [...path, cave]);
       });
     }
   };
