@@ -24,7 +24,7 @@ const printDots = (dots: Dot[]) => {
     .map((row) => {
       let rowStr = '';
       for (const point of row) {
-        rowStr += point || '.'
+        rowStr += point || '.';
       }
       return rowStr;
     })
@@ -52,12 +52,9 @@ const applyFold = (dots: Dot[], fold: Fold) => {
 export const transparentOrigami = (input: string[][], foldsToExec = 1) => {
   const [dots, folds] = parseInput(input);
 
-  let dotsAfterFold = dots;
-  for (let i = 0; i < foldsToExec; i++) {
-    dotsAfterFold = applyFold(dotsAfterFold, folds[i]);
-  }
-
-  return dotsAfterFold.length;
+  return folds
+    .slice(0, foldsToExec)
+    .reduce((acc, fold) => applyFold(acc, fold), dots).length;
 };
 
 export const printInstructions = (input: string[][]) => {

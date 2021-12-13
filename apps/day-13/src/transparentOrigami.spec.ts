@@ -24,8 +24,19 @@ fold along x=5`
   .split('\n\n')
   .map((r) => r.split('\n'));
 
-describe('transparentOrigami', () => {
 
+// #####
+// #...#
+// #...#
+// #...#
+// #####
+const output = `#####
+#...#
+#...#
+#...#
+#####`;
+
+describe('transparentOrigami', () => {
   test('should return the expected result', () => {
     const result = transparentOrigami(input, 1);
     expect(result).toEqual(17);
@@ -39,6 +50,9 @@ describe('transparentOrigami', () => {
 
 describe('printInstructions', () => {
   test('should print the result', () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation(jest.fn());
     printInstructions(input);
-  })
-})
+    expect(spy).toHaveBeenCalledWith(output);
+    jest.clearAllMocks();
+  });
+});
