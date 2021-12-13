@@ -30,11 +30,11 @@ fold along x=5`
 // #...#
 // #...#
 // #####
-const output = `#####
-#...#
-#...#
-#...#
-#####`;
+const output = `⬜️⬜️⬜️⬜️⬜️
+⬜️⬛️⬛️⬛️⬜️
+⬜️⬛️⬛️⬛️⬜️
+⬜️⬛️⬛️⬛️⬜️
+⬜️⬜️⬜️⬜️⬜️`;
 
 describe('transparentOrigami', () => {
   test('should return the expected result', () => {

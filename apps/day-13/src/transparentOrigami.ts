@@ -14,7 +14,7 @@ const parseInput = (input: string[][]) =>
   ] as [Dot[], Fold[]];
 
 const printDots = (dots: Dot[]) => {
-  const output = dots.reduce((output, { x, y }) => {
+  const output: string[] = dots.reduce((output, { x, y }) => {
     output[y] = output[y] || [];
     output[y][x] = '⬜️';
     return output;
@@ -22,13 +22,9 @@ const printDots = (dots: Dot[]) => {
 
   console.log(
     output
-      .map((row) => {
-        let rowStr = '';
-        for (const point of row) {
-          rowStr += point || '⬛️';
-        }
-        return rowStr;
-      })
+      .map((row) =>
+        Array.from(row).reduce((acc, point) => acc + (point || '⬛️'), '')
+      )
       .join('\n')
   );
 };
