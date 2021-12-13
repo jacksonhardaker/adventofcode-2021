@@ -16,7 +16,7 @@ const parseInput = (input: string[][]) =>
 const printDots = (dots: Dot[]) => {
   const output = dots.reduce((output, { x, y }) => {
     output[y] = output[y] || [];
-    output[y][x] = '#';
+    output[y][x] = '⬜️';
     return output;
   }, []);
 
@@ -25,7 +25,7 @@ const printDots = (dots: Dot[]) => {
       .map((row) => {
         let rowStr = '';
         for (const point of row) {
-          rowStr += point || '.';
+          rowStr += point || '⬛️';
         }
         return rowStr;
       })
