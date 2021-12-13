@@ -20,9 +20,12 @@ const input = `6,10
 9,0
 
 fold along y=7
-fold along x=5`.split('\n\n').map((r) => r.split('\n'));
+fold along x=5`
+  .split('\n\n')
+  .map((r) => r.split('\n'));
 
 describe('transparentOrigami', () => {
+
   test('should return the expected result', () => {
     const result = transparentOrigami(input);
 
