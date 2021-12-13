@@ -1,4 +1,4 @@
-import { transparentOrigami } from './transparentOrigami';
+import { transparentOrigami, printInstructions } from './transparentOrigami';
 
 const input = `6,10
 0,14
@@ -27,8 +27,18 @@ fold along x=5`
 describe('transparentOrigami', () => {
 
   test('should return the expected result', () => {
-    const result = transparentOrigami(input);
-
+    const result = transparentOrigami(input, 1);
     expect(result).toEqual(17);
   });
+
+  test('should return the expected result', () => {
+    const result = transparentOrigami(input, 2);
+    expect(result).toEqual(16);
+  });
 });
+
+describe('printInstructions', () => {
+  test('should print the result', () => {
+    printInstructions(input);
+  })
+})
