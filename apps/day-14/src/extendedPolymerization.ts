@@ -12,11 +12,14 @@ class ListNode {
     this.previous = previous;
   }
 
-  toArray() {
-    return this.next ? [this.value, ...this.next.toArray()] : [this.value];
-  }
   toString() {
-    return this.toArray().join('');
+    let next = this.next;
+    let result = this.value;
+    while(next) {
+      result += next.value;
+      next = next.next;
+    }
+    return result;
   }
 }
 
