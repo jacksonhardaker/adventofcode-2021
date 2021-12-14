@@ -53,8 +53,6 @@ export const extendedPolymerization = (input: string[], steps = 10) => {
     ? aggregate[tail.slice(1, 2)] + 1
     : 1;
 
-  console.log(aggregate);
-
   const ordered = Object.values(aggregate).sort((a, b) =>
     a === b ? 0 : a > b ? 1 : -1
   );
