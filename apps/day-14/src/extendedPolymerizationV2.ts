@@ -16,13 +16,14 @@ export const extendedPolymerization = (input: string[], steps = 10) => {
   let tail = start.slice(-2);
 
   for (let i = 0; i < steps; i++) {
+    let newTail;
     pairs = Object.entries(pairs).reduce((acc, [pair, count]) => {
       if (instructions[pair]) {
         const key1 = `${pair.slice(0, 1)}${instructions[pair]}`;
         const key2 = `${instructions[pair]}${pair.slice(1, 2)}`;
 
         if (pair === tail) {
-          tail = key2;
+          newTail = key2;
         }
 
         return {
@@ -37,6 +38,7 @@ export const extendedPolymerization = (input: string[], steps = 10) => {
         };
       }
     }, {});
+    tail = newTail;
   }
 
   const aggregate = Object.entries(pairs).reduce(
