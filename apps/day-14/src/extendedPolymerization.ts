@@ -15,7 +15,7 @@ class ListNode {
   toString() {
     let next = this.next;
     let result = this.value;
-    while(next) {
+    while (next) {
       result += next.value;
       next = next.next;
     }
@@ -23,9 +23,14 @@ class ListNode {
   }
 }
 
-export const parseInput = (input: string[]): [string, string[][]] => [
+export const parseInput = (
+  input: string[]
+): [string, Record<string, string>] => [
   input[0],
-  input[1].split('\n').map((instruction) => instruction.split(' -> ')),
+  input[1].split('\n').reduce((acc, instruction) => {
+    const [key, val] = instruction.split(' -> ');
+    return { ...acc, [key]: val };
+  }, {} as Record<string, string>),
 ];
 
 const buildPolymerList = (polymer: string) =>
@@ -47,11 +52,9 @@ export const buildPolymer = (input: string[], steps = 10) => {
     const nodes = buildPolymerList(polymer);
 
     const insertions = Array.from(polymer).reduce((acc, val, i, arr) => {
-      const instruction = instructions.find(
-        ([pair]) => pair === `${val}${arr[i + 1]}`
-      );
-      return instruction
-        ? [...acc, [nodes[i], nodes[i + 1], instruction[1], i]]
+      const pair = `${val}${arr[i + 1]}`;
+      return instructions[pair]
+        ? [...acc, [nodes[i], nodes[i + 1], instructions[pair], i]]
         : acc;
     }, []);
 

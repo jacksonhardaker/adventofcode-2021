@@ -27,24 +27,24 @@ describe('parseInput', () => {
   test('should split the input into the starting polymer template and the list of pair insertions', () => {
     expect(parseInput(input)).toEqual([
       'NNCB',
-      [
-        ['CH', 'B'],
-        ['HH', 'N'],
-        ['CB', 'H'],
-        ['NH', 'C'],
-        ['HB', 'C'],
-        ['HC', 'B'],
-        ['HN', 'C'],
-        ['NN', 'C'],
-        ['BH', 'H'],
-        ['NC', 'B'],
-        ['NB', 'B'],
-        ['BN', 'B'],
-        ['BB', 'N'],
-        ['BC', 'B'],
-        ['CC', 'N'],
-        ['CN', 'C'],
-      ],
+      {
+        CH: 'B',
+        HH: 'N',
+        CB: 'H',
+        NH: 'C',
+        HB: 'C',
+        HC: 'B',
+        HN: 'C',
+        NN: 'C',
+        BH: 'H',
+        NC: 'B',
+        NB: 'B',
+        BN: 'B',
+        BB: 'N',
+        BC: 'B',
+        CC: 'N',
+        CN: 'C',
+      },
     ]);
   });
 });
