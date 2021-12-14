@@ -1,4 +1,8 @@
-import { extendedPolymerization, parseInput, buildPolymer } from './extendedPolymerization';
+import {
+  extendedPolymerization,
+  parseInput,
+  buildPolymer,
+} from './extendedPolymerization';
 
 const input = `NNCB
 
@@ -65,7 +69,11 @@ describe('buildPolymer', () => {
 });
 
 describe('extendedPolymerization', () => {
-  test('should return the most letter count minus the least letter count', () => {
+  test('should return the most letter count minus the least letter count after 10 runs', () => {
     expect(extendedPolymerization(input, 10)).toEqual(1588);
-  })
-})
+  });
+
+  test('should return the most letter count minus the least letter count after 40 runs', () => {
+    expect(extendedPolymerization(input, 40)).toEqual(2188189693529);
+  });
+});
