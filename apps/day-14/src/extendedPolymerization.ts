@@ -51,17 +51,14 @@ export const buildPolymer = (input: string[], steps = 10) => {
   for (let i = 0; i < steps; i++) {
     const nodes = buildPolymerList(polymer);
 
-    const insertions = Array.from(polymer).reduce((acc, val, i, arr) => {
+    Array.from(polymer).forEach((val, i, arr) => {
       const pair = `${val}${arr[i + 1]}`;
-      return instructions[pair]
-        ? [...acc, [nodes[i], nodes[i + 1], instructions[pair], i]]
-        : acc;
-    }, []);
-
-    insertions.forEach(([prev, next, letter]) => {
-      const node = new ListNode(letter, prev, next);
-      prev.next = node;
-      next.previous = node;
+      const instruction = instructions[pair];
+      if (instruction) {
+        const node = new ListNode(instruction, nodes[i], nodes[i + 1]);
+        nodes[i].next = node;
+        nodes[i + 1].previous = node;
+      }
     });
 
     polymer = nodes[0].toString();
