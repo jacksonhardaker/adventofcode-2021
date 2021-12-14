@@ -74,6 +74,6 @@ describe('extendedPolymerization', () => {
   });
 
   test.skip('should return the most letter count minus the least letter count after 40 runs', () => {
-    expect(extendedPolymerization(input, 40)).toEqual(2188189693529);
+    expect(extendedPolymerization(input, 13)).toEqual(2188189693529);
   });
 });

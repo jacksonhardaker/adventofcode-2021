@@ -50,15 +50,14 @@ export const buildPolymer = (input: string[], steps = 10) => {
 
   for (let i = 0; i < steps; i++) {
     const nodes = buildPolymerList(polymer);
+    const pattern = RegExp(`(?=(${Object.keys(instructions).join('|')}))`, 'g');
+    const matches = Array.from(polymer.matchAll(pattern));
 
-    Array.from(polymer).forEach((val, i, arr) => {
-      const pair = `${val}${arr[i + 1]}`;
-      const instruction = instructions[pair];
-      if (instruction) {
-        const node = new ListNode(instruction, nodes[i], nodes[i + 1]);
-        nodes[i].next = node;
-        nodes[i + 1].previous = node;
-      }
+    matches.forEach((match) => {
+      const instruction = instructions[match[1]];
+      const node = new ListNode(instruction, nodes[match.index], nodes[match.index + 1]);
+      nodes[match.index].next.previous = node;
+      nodes[match.index].next = node;
     });
 
     polymer = nodes[0].toString();
