@@ -63,3 +63,9 @@ describe('buildPolymer', () => {
     expect(buildPolymer(input, 10).length).toEqual(3073);
   });
 });
+
+describe('extendedPolymerization', () => {
+  test('should return the most letter count minus the least letter count', () => {
+    expect(extendedPolymerization(input, 10)).toEqual(1588);
+  })
+})

@@ -47,7 +47,9 @@ export const buildPolymer = (input: string[], steps = 10) => {
       const instruction = instructions.find(
         ([pair]) => pair === `${val}${arr[i + 1]}`
       );
-      return instruction ? [...acc, [nodes[i], nodes[i + 1], instruction[1], i]] : acc;
+      return instruction
+        ? [...acc, [nodes[i], nodes[i + 1], instruction[1], i]]
+        : acc;
     }, []);
 
     insertions.forEach(([prev, next, letter]) => {
@@ -63,5 +65,18 @@ export const buildPolymer = (input: string[], steps = 10) => {
 };
 
 export const extendedPolymerization = (input: string[], steps = 10) => {
-  return null;
+  const polymer = buildPolymer(input, steps);
+
+  const letterMap = Array.from(polymer).reduce((acc, value) => {
+    return {
+      ...acc,
+      [value]: acc[value] ? acc[value] + 1 : 1,
+    };
+  }, {} as Record<string, number>);
+
+  const counts = Object.values(letterMap).sort((a, b) =>
+    a === b ? 0 : a > b ? 1 : -1
+  );
+
+  return counts[counts.length - 1] - counts[0];
 };
