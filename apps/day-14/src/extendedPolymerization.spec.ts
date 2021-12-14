@@ -50,7 +50,7 @@ describe('buildPolymer', () => {
     [1, 'NCNBCHB'],
     [2, 'NBCCNBBBCBHCB'],
     [3, 'NBBBCNCCNBBNBNBBCHBHHBCHB'],
-    // [4, 'NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB'],
+    [4, 'NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB'],
   ])('should return the expected result after %i step(s)', (steps, result) => {
     expect(buildPolymer(input, steps)).toEqual(result);
   });

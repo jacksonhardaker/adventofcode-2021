@@ -42,11 +42,12 @@ export const buildPolymer = (input: string[], steps = 10) => {
 
   for (let i = 0; i < steps; i++) {
     const nodes = buildPolymerList(polymer);
-    const insertions = instructions.reduce((acc, [pair, letter]) => {
-      const index = polymer.indexOf(pair);
-      return index > -1
-        ? [...acc, [nodes[index], nodes[index + 1], letter]]
-        : acc;
+
+    const insertions = Array.from(polymer).reduce((acc, val, i, arr) => {
+      const instruction = instructions.find(
+        ([pair]) => pair === `${val}${arr[i + 1]}`
+      );
+      return instruction ? [...acc, [nodes[i], nodes[i + 1], instruction[1], i]] : acc;
     }, []);
 
     insertions.forEach(([prev, next, letter]) => {
