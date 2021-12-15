@@ -91,7 +91,6 @@ const findPaths = (start: Node, cave: Cave) => {
     notInfinite.delete(current);
 
     if (current.isEnd) {
-      console.log('end');
       break;
     }
     
