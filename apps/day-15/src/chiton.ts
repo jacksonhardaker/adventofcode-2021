@@ -104,3 +104,21 @@ export const chiton = (input: number[][]) => {
   const cave = buildMap(input);
   return findPaths(cave.get(key(0, 0)), cave);
 };
+
+export const expandMap = (input: number[][]) => {
+  const expandedRows: number[][] = [];
+
+  for (let i = 0; i < 5; i++) {
+    for (let y = 0; y < input.length; y++) {
+      let newRow = [];
+      for (let j = 0; j < 5; j++) {
+        newRow = [
+          ...newRow,
+          ...input[y].map((val) => (val + i + j >= 10 ? val + i + j - 9 : val + i + j)),
+        ];
+      }
+      expandedRows.push(newRow);
+    }
+  }
+  return expandedRows;
+};
