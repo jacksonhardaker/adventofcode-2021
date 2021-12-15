@@ -6,15 +6,17 @@ type Key = `${Y},${X}`;
 type Cave = Map<Key, Node>;
 class Node {
   value: number;
-  coords: Coords;
+  key: Key;
   up: PossiblyNode;
   down: PossiblyNode;
   left: PossiblyNode;
   right: PossiblyNode;
+  isEnd: boolean;
   constructor(value: number, coords: Coords) {
     Object.assign(this, {
       value,
-      coords,
+      isEnd: false,
+      key: `${coords[0]},${coords[1]}`,
     });
   }
 
@@ -29,15 +31,6 @@ class Node {
     this.left = left;
     this.right = right;
   }
-
-  isStart() {
-    const [y, x] = this.coords;
-    return y === 0 && x === 0;
-  }
-  isEnd() {
-    const [y, x] = this.coords;
-    return y === 9 && x === 9;
-  }
 }
 
 const key = (y: number, x: number): Key => `${y},${x}`;
@@ -51,75 +44,88 @@ const buildMap = (input: number[][]) => {
       const down = cave.get(key(y + 1, x));
       const left = cave.get(key(y, x - 1));
       const right = cave.get(key(y, x + 1));
+
       node.setConnections(up, down, left, right);
+      node.isEnd = y === input.length - 1 && x === input[y].length - 1;
 
       if (up) up.down = node;
       if (down) down.up = node;
       if (left) left.right = node;
       if (right) right.left = node;
 
-      cave.set(key(y, x), node);
+      cave.set(node.key, node);
     }
   }
 
   return cave;
 };
 
-const findPaths = (start: Node) => {
-  // const paths: Coords[][] = [];
-  let lowestRiskPath = Infinity;
+const findPaths = (start: Node, cave: Cave) => {
+  // Let the node at which we are starting at be called the initial node.
+  // Let the distance of node Y be the distance from the initial node to Y.
+  // Dijkstra's algorithm will initially start with infinite distances and will try to improve them step by step.
+  // 1.
+  // Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.
+  const unvisited = new Set(cave.values());
+  const tentatives = Array.from(cave.keys()).reduce((acc, key) => {
+    acc.set(key, key === '0,0' ? 0 : Infinity);
+    return acc;
+  }, new Map<string, number>());
 
-  const traverse = (
-    node: Node,
-    path: Coords[],
-    risk: number,
-    visited: Record<Key, boolean>
-  ) => {
-    const isVisited = (node: Node) =>
-      node ? visited[key(...node.coords)] : true;
+  // 2.
+  // Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes.
+  // The tentative distance of a node v is the length of the shortest path discovered so far between the node v and the starting node.
+  // Since initially no path is known to any other vertex than the source itself (which is a path of length zero),
+  // all other tentative distances are initially set to infinity. Set the initial node as current.
+  let current = start;
+  while (current) {
+    // 3.
+    // For the current node, consider all of its unvisited neighbors and calculate their tentative distances through the current node.
+    //  Compare the newly calculated tentative distance to the current assigned value and assign the smaller one.
+    // For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbor B has length 2, then the distance to B through A will be 6 + 2 = 8.
+    // If B was previously marked with a distance greater than 8 then change it to 8. Otherwise, the current value will be kept.
+    [current.up, current.down, current.left, current.right].forEach(
+      (neighbor) => {
+        if (unvisited.has(neighbor)) {
+          const oldTentative = tentatives.get(neighbor.key);
+          const newTentative = tentatives.get(current.key) + neighbor.value;
+          tentatives.set(
+            neighbor.key,
+            newTentative < oldTentative ? newTentative : oldTentative
+          );
+        }
+      }
+    );
 
-    // path.push(node.coords);
-    if (!node.isStart()) {
-      risk += node.value;
+    // 4.
+    // When we are done considering all of the unvisited neighbors of the current node, mark the current node as visited and remove it from the unvisited set.
+    // A visited node will never be checked again.
+    unvisited.delete(current);
+
+    // 5.
+    // If the destination node has been marked visited (when planning a route between two specific nodes) or if the smallest tentative distance
+    // among the nodes in the unvisited set is infinity (when planning a complete traversal; occurs when there is no connection between the
+    // initial node and remaining unvisited nodes), then stop. The algorithm has finished.
+    if (current.isEnd) {
+      break;
     }
 
-    if (
-      risk > lowestRiskPath ||
-      (isVisited(node.up) &&
-        isVisited(node.down) &&
-        isVisited(node.left) &&
-        isVisited(node.right))
-    )
-      return;
+    // 6.
+    // Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new current node, and go back to step 3.
+    current = Array.from(unvisited.values()).reduce((acc, node) => {
+      if (!acc) return node;
 
-    // if (node.up && !node.up.isStart() && !isVisited(node.up)) {
-    //   traverse(node.up, [...path], risk, { ...visited });
-    // }
-    if (node.down && !node.down.isStart() && !isVisited(node.down)) {
-      traverse(node.down, [...path], risk, { ...visited });
-    }
-    // if (node.left && !node.left.isStart() && !isVisited(node.left)) {
-    //   traverse(node.left, [...path], risk, { ...visited });
-    // }
-    if (node.right && !node.right.isStart() && !isVisited(node.right)) {
-      traverse(node.right, [...path], risk, { ...visited });
-    }
+      const nodeVal = tentatives.get(node.key);
+      const accVal = tentatives.get(acc.key);
 
-    if (node.isEnd()) {
-      if (lowestRiskPath > risk) lowestRiskPath = risk;
-      return;
-      // return paths.push(path);
-    }
-  };
+      return nodeVal < accVal ? node : acc;
+    }, null);
+  }
 
-  traverse(start, [], 0, {});
-
-  // console.log(paths);
-  console.log(lowestRiskPath);
-  return lowestRiskPath;
+  return Array.from(tentatives.values())[tentatives.size - 1];
 };
 
 export const chiton = (input: number[][]) => {
   const cave = buildMap(input);
-  return findPaths(cave.get(key(0, 0)));
+  return findPaths(cave.get(key(0, 0)), cave);
 };
