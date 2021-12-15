@@ -66,9 +66,11 @@ const findPaths = (start: Node, cave: Cave) => {
     acc.set(key, key === '0,0' ? 0 : Infinity);
     return acc;
   }, new Map<string, number>());
+  const notInfinite = new Set<Node>();
 
   let current = start;
   while (current) {
+    const changed = [];
     [current.up, current.down, current.left, current.right].forEach(
       (neighbor) => {
         if (unvisited.has(neighbor)) {
@@ -78,16 +80,22 @@ const findPaths = (start: Node, cave: Cave) => {
             neighbor.key,
             newTentative < oldTentative ? newTentative : oldTentative
           );
+
+          changed.push(neighbor);
+          notInfinite.add(neighbor);
         }
       }
     );
 
     unvisited.delete(current);
+    notInfinite.delete(current);
 
     if (current.isEnd) {
+      console.log('end');
       break;
     }
-    current = Array.from(unvisited.values()).reduce((acc, node) => {
+    
+    const thing = Array.from(notInfinite.values()).reduce((acc, node) => {
       if (!acc) return node;
 
       const nodeVal = tentatives.get(node.key);
@@ -95,6 +103,7 @@ const findPaths = (start: Node, cave: Cave) => {
 
       return nodeVal < accVal ? node : acc;
     }, null);
+    current = thing;
   }
 
   return Array.from(tentatives.values())[tentatives.size - 1];
@@ -114,7 +123,9 @@ export const expandMap = (input: number[][]) => {
       for (let j = 0; j < 5; j++) {
         newRow = [
           ...newRow,
-          ...input[y].map((val) => (val + i + j >= 10 ? val + i + j - 9 : val + i + j)),
+          ...input[y].map((val) =>
+            val + i + j >= 10 ? val + i + j - 9 : val + i + j
+          ),
         ];
       }
       expandedRows.push(newRow);
