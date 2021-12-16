@@ -83,6 +83,18 @@ export const parseBinary = (binary: string[]): Packet[] => {
                 );
         }
         break;
+      case TypeID.product:
+        {
+          parseOperator();
+          packet.value =
+            packet.subPackets.length === 1
+              ? packet.subPackets[0].value
+              : packet.subPackets.reduce(
+                  (acc, subpacket) => acc * subpacket.value,
+                  1
+                );
+        }
+        break;
       default:
         {
           parseOperator();

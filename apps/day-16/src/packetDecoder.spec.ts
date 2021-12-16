@@ -106,7 +106,7 @@ describe('sumOfVersions', () => {
 describe('evalPackets', () => {
   test.each([
     { input: 'C200B40A82', expected: 3 },
-    // { input: '04005AC33890', expected: 54 },
+    { input: '04005AC33890', expected: 54 },
     // { input: '880086C3E88112', expected: 7 },
     // { input: 'CE00C43D881120', expected: 9 },
     // { input: 'D8005AC2A8F0', expected: 1 },
