@@ -43,6 +43,22 @@ export const parseBinary = (binary: string[]): Packet[] => {
       subPackets: [],
     };
 
+    const parseOperator = () => {
+      packet.lengthTypeId = chomp(1) as 0 | 1;
+
+      if (packet.lengthTypeId == 0) {
+        packet.totalSubPacketLength = chomp(LengthTypeId[0]);
+        packet.subPackets = parseBinary(
+          binary.splice(0, packet.totalSubPacketLength)
+        );
+      } else if (packet.lengthTypeId == 1) {
+        packet.subPacketCount = chomp(LengthTypeId[1]);
+        packet.subPackets = Array(packet.subPacketCount)
+          .fill(0)
+          .map(() => chompPacket(packet));
+      }
+    };
+
     switch (packet.typeId) {
       case TypeID.literal:
         {
@@ -55,21 +71,21 @@ export const parseBinary = (binary: string[]): Packet[] => {
           packet.value = parseInt(num.join(''), 2);
         }
         break;
+      case TypeID.sum:
+        {
+          parseOperator();
+          packet.value =
+            packet.subPackets.length === 1
+              ? packet.subPackets[0].value
+              : packet.subPackets.reduce(
+                  (acc, subpacket) => acc + subpacket.value,
+                  0
+                );
+        }
+        break;
       default:
         {
-          packet.lengthTypeId = chomp(1) as 0 | 1;
-
-          if (packet.lengthTypeId == 0) {
-            packet.totalSubPacketLength = chomp(LengthTypeId[0]);
-            packet.subPackets = parseBinary(
-              binary.splice(0, packet.totalSubPacketLength)
-            );
-          } else if (packet.lengthTypeId == 1) {
-            packet.subPacketCount = chomp(LengthTypeId[1]);
-            packet.subPackets = Array(packet.subPacketCount)
-              .fill(0)
-              .map(() => chompPacket(packet));
-          }
+          parseOperator();
         }
         break;
     }
