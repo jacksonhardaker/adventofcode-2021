@@ -43,35 +43,38 @@ export const parseBinary = (binary: string[]): Packet[] => {
       subPackets: [],
     };
 
-    if (packet.typeId !== TypeID.literal) {
-      packet.lengthTypeId = chomp(1) as 0 | 1;
+    switch (packet.typeId) {
+      case TypeID.literal:
+        {
+          let isLastGroup = false;
+          const num = [];
+          while (!isLastGroup) {
+            isLastGroup = chomp(1) == 0;
+            num.push(chompWithoutParse(4));
+          }
+          packet.value = parseInt(num.join(''), 2);
+        }
+        break;
+      default:
+        {
+          packet.lengthTypeId = chomp(1) as 0 | 1;
 
-      if (packet.lengthTypeId == 0) {
-        packet.totalSubPacketLength = chomp(LengthTypeId[0]);
-      } else if (packet.lengthTypeId == 1) {
-        packet.subPacketCount = chomp(LengthTypeId[1]);
-      }
-    } else {
-      let isLastGroup = false;
-      const num = [];
-      while (!isLastGroup) {
-        isLastGroup = chomp(1) == 0;
-        num.push(chompWithoutParse(4));
-      }
-      packet.value = parseInt(num.join(''), 2);
+          if (packet.lengthTypeId == 0) {
+            packet.totalSubPacketLength = chomp(LengthTypeId[0]);
+            packet.subPackets = parseBinary(
+              binary.splice(0, packet.totalSubPacketLength)
+            );
+          } else if (packet.lengthTypeId == 1) {
+            packet.subPacketCount = chomp(LengthTypeId[1]);
+            packet.subPackets = Array(packet.subPacketCount)
+              .fill(0)
+              .map(() => chompPacket(packet));
+          }
+        }
+        break;
     }
+
     parent ? parent.subPackets.push(packet) : packets.push(packet);
-
-    if (packet.typeId !== TypeID.literal && packet.lengthTypeId == 0) {
-      packet.subPackets = parseBinary(
-        binary.splice(0, packet.totalSubPacketLength)
-      );
-    } else if (packet.typeId !== TypeID.literal && packet.lengthTypeId == 1) {
-      packet.subPackets = Array(packet.subPacketCount)
-        .fill(0)
-        .map(() => chompPacket(packet));
-    }
-
     return packet;
   };
 
