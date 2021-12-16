@@ -50,9 +50,10 @@ export const parseBinary = (binary: string[]): Packet[] => {
   const packet = chompPacket();
 
   if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 0) {
-    packet.subPackets = parseBinary(binary.splice(0, packet.totalSubPacketLength));
+    packet.subPackets = parseBinary(
+      binary.splice(0, packet.totalSubPacketLength)
+    );
   } else if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 1) {
-
     packet.subPackets = Array(packet.subPacketCount)
       .fill(0)
       .map(() => chompPacket(packet));
@@ -65,7 +66,12 @@ export const packetDecoder = (input: string) => {
   const binary = Array.from(parseInt(input, 16).toString(2));
   const packets = parseBinary(binary);
 
-  // console.log(JSON.stringify(packets, null, 2));
+  const sumVersionNumbers = (packets: Packet[]) =>
+    packets.reduce((acc, packet) => {
+      const subPacketsSum =
+        packet.subPackets.length > 0 ? sumVersionNumbers(packet.subPackets) : 0;
+      return acc + packet.version + subPacketsSum;
+    }, 0);
 
-  return null;
+  return sumVersionNumbers(packets);
 };
