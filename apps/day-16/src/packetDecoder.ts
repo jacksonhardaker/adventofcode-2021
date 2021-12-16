@@ -1,4 +1,3 @@
-type PacketType = 'operator' | 'literal';
 type Packet = {
   version: number;
   typeId: number;
@@ -15,10 +14,11 @@ const OPERATOR_TYPE_NEXT = {
   1: 11,
 };
 
-const parseBinary = (binary: string[]) => {
-  const packets = [];
+export const parseBinary = (binary: string[]): Packet[] => {
+  const packets: Packet[] = [];
 
   const chomp = (length) => parseInt(binary.splice(0, length).join(''), 2);
+  const chompWithoutParse = (length) => binary.splice(0, length).join('');
   const chompPacket = (parent?: Packet) => {
     const packet: Packet = {
       version: chomp(3),
@@ -39,7 +39,7 @@ const parseBinary = (binary: string[]) => {
       const num = [];
       while (!isLastGroup) {
         isLastGroup = chomp(1) == 0;
-        num.push(chomp(4));
+        num.push(chompWithoutParse(4));
       }
       packet.literalValue = parseInt(num.join(''), 2);
     }
@@ -48,10 +48,12 @@ const parseBinary = (binary: string[]) => {
   };
 
   const packet = chompPacket();
+
   if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 0) {
-    parseBinary(binary.splice(0, packet.totalSubPacketLength));
+    packet.subPackets = parseBinary(binary.splice(0, packet.totalSubPacketLength));
   } else if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 1) {
-    packet.subPackets = Array(packet.totalSubPacketLength)
+
+    packet.subPackets = Array(packet.subPacketCount)
       .fill(0)
       .map(() => chompPacket(packet));
   }
@@ -61,14 +63,9 @@ const parseBinary = (binary: string[]) => {
 
 export const packetDecoder = (input: string) => {
   const binary = Array.from(parseInt(input, 16).toString(2));
-
-  // }
   const packets = parseBinary(binary);
 
-  console.log(packets);
-
-  // console.log(chompPacket());
-  // console.log(binary);
+  // console.log(JSON.stringify(packets, null, 2));
 
   return null;
 };
