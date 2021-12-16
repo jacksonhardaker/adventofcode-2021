@@ -77,10 +77,7 @@ export const parseBinary = (binary: string[]): Packet[] => {
           packet.value =
             packet.subPackets.length === 1
               ? packet.subPackets[0].value
-              : packet.subPackets.reduce(
-                  (acc, subpacket) => acc + subpacket.value,
-                  0
-                );
+              : packet.subPackets.reduce((acc, sub) => acc + sub.value, 0);
         }
         break;
       case TypeID.product:
@@ -89,10 +86,19 @@ export const parseBinary = (binary: string[]): Packet[] => {
           packet.value =
             packet.subPackets.length === 1
               ? packet.subPackets[0].value
-              : packet.subPackets.reduce(
-                  (acc, subpacket) => acc * subpacket.value,
-                  1
-                );
+              : packet.subPackets.reduce((acc, sub) => acc * sub.value, 1);
+        }
+        break;
+      case TypeID.minimum:
+        {
+          parseOperator();
+          packet.value = Math.min(...packet.subPackets.map((sub) => sub.value));
+        }
+        break;
+      case TypeID.maximum:
+        {
+          parseOperator();
+          packet.value = Math.max(...packet.subPackets.map((sub) => sub.value));
         }
         break;
       default:
