@@ -111,8 +111,8 @@ describe('evalPackets', () => {
     { input: 'CE00C43D881120', expected: 9 },
     { input: 'D8005AC2A8F0', expected: 1 },
     { input: 'F600BC2D8F', expected: 0 },
-    // { input: '9C005AC2F8F0', expected: 0 },
-    // { input: '9C0141080250320F1802104A08', expected: 1 },
+    { input: '9C005AC2F8F0', expected: 0 },
+    { input: '9C0141080250320F1802104A08', expected: 1 },
   ])(
     'should return the value ($expected) of the outermost packet after operators have evaluated',
     ({ input, expected }) => {

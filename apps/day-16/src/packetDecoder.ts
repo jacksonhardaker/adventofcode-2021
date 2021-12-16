@@ -103,18 +103,23 @@ export const parseBinary = (binary: string[]): Packet[] => {
         break;
       case TypeID.greaterThan:
         {
-          // Packets with type ID 5 are greater than packets - their value is 1 if the value of the first sub-packet is
-          // greater than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
           parseOperator();
-          packet.value = packet.subPackets[0].value > packet.subPackets[1].value ? 1 : 0;
+          packet.value =
+            packet.subPackets[0].value > packet.subPackets[1].value ? 1 : 0;
         }
         break;
       case TypeID.lessthan:
         {
-          // Packets with type ID 6 are less than packets - their value is 1 if the value of the first sub-packet is less than
-          // the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
           parseOperator();
-          packet.value = packet.subPackets[0].value < packet.subPackets[1].value ? 1 : 0;
+          packet.value =
+            packet.subPackets[0].value < packet.subPackets[1].value ? 1 : 0;
+        }
+        break;
+      case TypeID.equalTo:
+        {
+          parseOperator();
+          packet.value =
+            packet.subPackets[0].value === packet.subPackets[1].value ? 1 : 0;
         }
         break;
       default:
