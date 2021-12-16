@@ -14,6 +14,13 @@ const OPERATOR_TYPE_NEXT = {
   1: 11,
 };
 
+export const hexToBinary = (input: string) => {
+  return Array.from(input).reduce(
+    (acc, hex) => acc + ('0000' + parseInt(hex, 16).toString(2)).slice(-4),
+    ''
+  );
+};
+
 export const parseBinary = (binary: string[]): Packet[] => {
   const packets: Packet[] = [];
 
@@ -44,26 +51,29 @@ export const parseBinary = (binary: string[]): Packet[] => {
       packet.literalValue = parseInt(num.join(''), 2);
     }
     parent ? parent.subPackets.push(packet) : packets.push(packet);
+
+    if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 0) {
+      packet.subPackets = parseBinary(
+        binary.splice(0, packet.totalSubPacketLength)
+      );
+    } else if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 1) {
+      packet.subPackets = Array(packet.subPacketCount)
+        .fill(0)
+        .map(() => chompPacket(packet));
+    }
+
     return packet;
   };
 
-  const packet = chompPacket();
-
-  if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 0) {
-    packet.subPackets = parseBinary(
-      binary.splice(0, packet.totalSubPacketLength)
-    );
-  } else if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 1) {
-    packet.subPackets = Array(packet.subPacketCount)
-      .fill(0)
-      .map(() => chompPacket(packet));
+  while(binary.length > 0) {
+    chompPacket();
   }
 
   return packets;
 };
 
 export const packetDecoder = (input: string) => {
-  const binary = Array.from(parseInt(input, 16).toString(2));
+  const binary = Array.from(hexToBinary(input));
   const packets = parseBinary(binary);
 
   const sumVersionNumbers = (packets: Packet[]) =>
@@ -72,6 +82,8 @@ export const packetDecoder = (input: string) => {
         packet.subPackets.length > 0 ? sumVersionNumbers(packet.subPackets) : 0;
       return acc + packet.version + subPacketsSum;
     }, 0);
+
+  // console.log(JSON.stringify(packets, null, 2));
 
   return sumVersionNumbers(packets);
 };
