@@ -1,4 +1,9 @@
-import { packetDecoder, parseBinary, hexToBinary } from './packetDecoder';
+import {
+  packetDecoder,
+  parseBinary,
+  hexToBinary,
+  evalPackets,
+} from './packetDecoder';
 
 describe('hexToBinary', () => {
   test('should parse the hex code to the correct binary', () => {
@@ -77,11 +82,11 @@ describe('parseBinary', () => {
     // The 11 bits labeled L (00000000011) contain the number of sub-packets, 3.
     expect(parsed[0].subPacketCount).toEqual(3);
     // The 11 bits labeled A contain the first sub-packet, a literal value representing the number 1.
-    expect(parsed[0].subPackets[0].literalValue).toEqual(1);
+    expect(parsed[0].subPackets[0].value).toEqual(1);
     // The 11 bits labeled B contain the second sub-packet, a literal value representing the number 2.
-    expect(parsed[0].subPackets[1].literalValue).toEqual(2);
+    expect(parsed[0].subPackets[1].value).toEqual(2);
     // The 11 bits labeled C contain the third sub-packet, a literal value representing the number 3.
-    expect(parsed[0].subPackets[2].literalValue).toEqual(3);
+    expect(parsed[0].subPackets[2].value).toEqual(3);
   });
 });
 
@@ -95,4 +100,22 @@ describe('packetDecoder', () => {
   ])('should return the expected result', (input, expected) => {
     expect(packetDecoder(input)).toEqual(expected);
   });
+});
+
+describe('evalPackets', () => {
+  test.only.each([
+    { input: 'C200B40A82', expected: 3 },
+    // { input: '04005AC33890', expected: 54 },
+    // { input: '880086C3E88112', expected: 7 },
+    // { input: 'CE00C43D881120', expected: 9 },
+    // { input: 'D8005AC2A8F0', expected: 1 },
+    // { input: 'F600BC2D8F', expected: 0 },
+    // { input: '9C005AC2F8F0', expected: 0 },
+    // { input: '9C0141080250320F1802104A08', expected: 1 },
+  ])(
+    'should return the value ($expected) of the outermost packet after operators have evaluated',
+    ({ input, expected }) => {
+      expect(evalPackets(input)).toEqual(expected);
+    }
+  );
 });

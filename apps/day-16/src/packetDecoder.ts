@@ -4,7 +4,7 @@ type Packet = {
   lengthTypeId?: 0 | 1;
   totalSubPacketLength?: number; // if length type id is 0
   subPacketCount?: number; // if length type id is 1
-  literalValue?: number; // if type id is 4
+  value?: number; // if type id is 4
   subPackets: Packet[];
 };
 
@@ -58,7 +58,7 @@ export const parseBinary = (binary: string[]): Packet[] => {
         isLastGroup = chomp(1) == 0;
         num.push(chompWithoutParse(4));
       }
-      packet.literalValue = parseInt(num.join(''), 2);
+      packet.value = parseInt(num.join(''), 2);
     }
     parent ? parent.subPackets.push(packet) : packets.push(packet);
 
@@ -93,7 +93,12 @@ export const packetDecoder = (input: string) => {
       return acc + packet.version + subPacketsSum;
     }, 0);
 
-  // console.log(JSON.stringify(packets, null, 2));
-
   return sumVersionNumbers(packets);
 };
+
+export const evalPackets = (input: string) => {
+  const binary = Array.from(hexToBinary(input));
+  const packets = parseBinary(binary);
+
+  return packets[0].value;
+}
