@@ -1,8 +1,9 @@
 import {
-  packetDecoder,
+  sumOfVersions,
   parseBinary,
   hexToBinary,
   evalPackets,
+  packetDecoder,
 } from './packetDecoder';
 
 describe('hexToBinary', () => {
@@ -90,7 +91,7 @@ describe('parseBinary', () => {
   });
 });
 
-describe('packetDecoder', () => {
+describe('sumOfVersions', () => {
   test.each([
     ['EE00D40C823060', 14],
     ['8A004A801A8002F478', 16],
@@ -98,12 +99,12 @@ describe('packetDecoder', () => {
     ['C0015000016115A2E0802F182340', 23],
     ['A0016C880162017C3686B18A3D4780', 31],
   ])('should return the expected result', (input, expected) => {
-    expect(packetDecoder(input)).toEqual(expected);
+    expect(sumOfVersions(packetDecoder(input))).toEqual(expected);
   });
 });
 
 describe('evalPackets', () => {
-  test.only.each([
+  test.each([
     { input: 'C200B40A82', expected: 3 },
     // { input: '04005AC33890', expected: 54 },
     // { input: '880086C3E88112', expected: 7 },

@@ -84,21 +84,19 @@ export const parseBinary = (binary: string[]): Packet[] => {
 
 export const packetDecoder = (input: string) => {
   const binary = Array.from(hexToBinary(input));
-  const packets = parseBinary(binary);
-
-  const sumVersionNumbers = (packets: Packet[]) =>
-    packets.reduce((acc, packet) => {
-      const subPacketsSum =
-        packet.subPackets.length > 0 ? sumVersionNumbers(packet.subPackets) : 0;
-      return acc + packet.version + subPacketsSum;
-    }, 0);
-
-  return sumVersionNumbers(packets);
+  return parseBinary(binary);
 };
+
+export const sumOfVersions = (packets: Packet[]): number =>
+  packets.reduce((acc, packet) => {
+    const subPacketsSum =
+      packet.subPackets.length > 0 ? sumOfVersions(packet.subPackets) : 0;
+    return acc + packet.version + subPacketsSum;
+  }, 0);
 
 export const evalPackets = (input: string) => {
   const binary = Array.from(hexToBinary(input));
   const packets = parseBinary(binary);
 
   return packets[0].value;
-}
+};
