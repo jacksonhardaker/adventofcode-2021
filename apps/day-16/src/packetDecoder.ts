@@ -60,17 +60,6 @@ export const parseBinary = (binary: string[]): Packet[] => {
     };
 
     switch (packet.typeId) {
-      case TypeID.literal:
-        {
-          let isLastGroup = false;
-          const num = [];
-          while (!isLastGroup) {
-            isLastGroup = chomp(1) == 0;
-            num.push(chompWithoutParse(4));
-          }
-          packet.value = parseInt(num.join(''), 2);
-        }
-        break;
       case TypeID.sum:
         {
           parseOperator();
@@ -99,6 +88,33 @@ export const parseBinary = (binary: string[]): Packet[] => {
         {
           parseOperator();
           packet.value = Math.max(...packet.subPackets.map((sub) => sub.value));
+        }
+        break;
+      case TypeID.literal:
+        {
+          let isLastGroup = false;
+          const num = [];
+          while (!isLastGroup) {
+            isLastGroup = chomp(1) == 0;
+            num.push(chompWithoutParse(4));
+          }
+          packet.value = parseInt(num.join(''), 2);
+        }
+        break;
+      case TypeID.greaterThan:
+        {
+          // Packets with type ID 5 are greater than packets - their value is 1 if the value of the first sub-packet is
+          // greater than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+          parseOperator();
+          packet.value = packet.subPackets[0].value > packet.subPackets[1].value ? 1 : 0;
+        }
+        break;
+      case TypeID.lessthan:
+        {
+          // Packets with type ID 6 are less than packets - their value is 1 if the value of the first sub-packet is less than
+          // the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+          parseOperator();
+          packet.value = packet.subPackets[0].value < packet.subPackets[1].value ? 1 : 0;
         }
         break;
       default:
