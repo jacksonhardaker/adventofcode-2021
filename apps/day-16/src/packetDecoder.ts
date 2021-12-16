@@ -22,7 +22,7 @@ enum TypeID {
 const LengthTypeId = {
   0: 15,
   1: 11,
-};
+} as const;
 
 export const hexToBinary = (input: string) => {
   return Array.from(input).reduce(
