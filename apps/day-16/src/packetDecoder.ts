@@ -8,8 +8,18 @@ type Packet = {
   subPackets: Packet[];
 };
 
-const LITERAL_TYPE = 4;
-const OPERATOR_TYPE_NEXT = {
+enum TypeID {
+  sum = 0,
+  product = 1,
+  minimum = 2,
+  maximum = 3,
+  literal = 4,
+  greaterThan = 5,
+  lessthan = 6,
+  equalTo = 7,
+}
+
+const LengthTypeId = {
   0: 15,
   1: 11,
 };
@@ -33,13 +43,13 @@ export const parseBinary = (binary: string[]): Packet[] => {
       subPackets: [],
     };
 
-    if (packet.typeId !== LITERAL_TYPE) {
+    if (packet.typeId !== TypeID.literal) {
       packet.lengthTypeId = chomp(1) as 0 | 1;
 
       if (packet.lengthTypeId == 0) {
-        packet.totalSubPacketLength = chomp(OPERATOR_TYPE_NEXT[0]);
+        packet.totalSubPacketLength = chomp(LengthTypeId[0]);
       } else if (packet.lengthTypeId == 1) {
-        packet.subPacketCount = chomp(OPERATOR_TYPE_NEXT[1]);
+        packet.subPacketCount = chomp(LengthTypeId[1]);
       }
     } else {
       let isLastGroup = false;
@@ -52,11 +62,11 @@ export const parseBinary = (binary: string[]): Packet[] => {
     }
     parent ? parent.subPackets.push(packet) : packets.push(packet);
 
-    if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 0) {
+    if (packet.typeId !== TypeID.literal && packet.lengthTypeId == 0) {
       packet.subPackets = parseBinary(
         binary.splice(0, packet.totalSubPacketLength)
       );
-    } else if (packet.typeId !== LITERAL_TYPE && packet.lengthTypeId == 1) {
+    } else if (packet.typeId !== TypeID.literal && packet.lengthTypeId == 1) {
       packet.subPackets = Array(packet.subPacketCount)
         .fill(0)
         .map(() => chompPacket(packet));
@@ -65,7 +75,7 @@ export const parseBinary = (binary: string[]): Packet[] => {
     return packet;
   };
 
-  while(binary.length > 0) {
+  while (binary.length > 0) {
     chompPacket();
   }
 
