@@ -13,9 +13,14 @@ describe('parseInput', () => {
 });
 
 describe('trickShot', () => {
-  test('should return the expected result', () => {
+  test('should return the expected maxY value', () => {
     const input = 'target area: x=20..30, y=-10..-5';
     const result = trickShot(parseInput(input));
-    expect(result).toEqual(45);
+    expect(result.maxY).toEqual(45);
+  });
+  test('should return the expected number of trajectories', () => {
+    const input = 'target area: x=20..30, y=-10..-5';
+    const result = trickShot(parseInput(input));
+    expect(result.trajectories.length).toEqual(112);
   });
 });
