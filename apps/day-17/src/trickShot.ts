@@ -45,6 +45,7 @@ export const trickShot = ({ x1, x2, y1, y2 }: TargetArea) => {
   };
   const trajectories = [];
 
+  // This could be optimized by attempting to calculate the possible min/max values for the x,y starting trajectory
   for (let trajX = -1000; trajX < 1000; trajX++) {
     for (let trajY = -1000; trajY < 1000; trajY++) {
       if (willHitTarget([trajX, trajY])) {
