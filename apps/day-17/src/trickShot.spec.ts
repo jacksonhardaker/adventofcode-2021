@@ -15,8 +15,7 @@ describe('parseInput', () => {
 describe('trickShot', () => {
   test('should return the expected result', () => {
     const input = 'target area: x=20..30, y=-10..-5';
-    const result = trickShot(input);
-
-    expect(result).toEqual(null);
+    const result = trickShot(parseInput(input));
+    expect(result).toEqual(45);
   });
 });
