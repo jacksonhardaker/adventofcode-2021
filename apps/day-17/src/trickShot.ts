@@ -40,26 +40,28 @@ export const trickShot = ({ x1, x2, y1, y2 }: TargetArea) => {
   //     // find all trajectories which will hit x,y from a start of 0,0
   //   }
   // }
+  let maxY = -Infinity;
+
   const willHitTarget = ([initialVelX, initialVelY]) => {
+    let trajMaxY = -Infinity;
     let [velX, velY] = [initialVelX, initialVelY];
     let [x, y] = [startX, startY];
-    let isBelowTarget = y < Math.min(y1, y2);
-    let isBeyondTarget = x > Math.max(x1, x2);
-    while (!isBelowTarget && !isBeyondTarget) {
+    while (!(y < Math.min(y1, y2)) && !(x > Math.max(x1, x2))) {
       x += velX;
       y += velY;
       velX = velX === 0 ? 0 : velX > 0 ? velX - 1 : velX + 1;
       velY += -1;
-      isBelowTarget = y < Math.min(y1, y2);
-      isBeyondTarget = x > Math.max(x1, x2);
+
+      trajMaxY = Math.max(trajMaxY, y);
 
       if (
-        x < Math.max(x1, x2) &&
-        x > Math.min(x1, x2) &&
-        y < Math.max(y1, y2) &&
-        y > Math.min(y1, y2)
+        x <= Math.max(x1, x2) &&
+        x >= Math.min(x1, x2) &&
+        y <= Math.max(y1, y2) &&
+        y >= Math.min(y1, y2)
       ) {
         // within target
+        maxY = Math.max(maxY, trajMaxY);
         return true;
       }
     }
@@ -67,9 +69,17 @@ export const trickShot = ({ x1, x2, y1, y2 }: TargetArea) => {
   };
   const trajectories = [];
 
-  if (willHitTarget([7, 2])) {
-    trajectories.push([7, 2]);
+  for (let trajX = 0; trajX < 100; trajX++) {
+    for (let trajY = 0; trajY < 100; trajY++) {
+      if (willHitTarget([trajX, trajY])) {
+        trajectories.push([trajX, trajY]);
+      }
+    }
   }
+
+  // if (willHitTarget([6, 9])) {
+  //   trajectories.push([6, 9]);
+  // }
 
   // for (let x = -100; x <= 100; x++) {
   //   for (let y = -100; y <= 100; y++) {
@@ -77,5 +87,7 @@ export const trickShot = ({ x1, x2, y1, y2 }: TargetArea) => {
   //   }
   // }
 
-  return null;
+  console.log({ trajectories });
+
+  return maxY;
 };
