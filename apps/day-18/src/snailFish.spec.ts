@@ -1,9 +1,9 @@
-import { day-18 } from './day-18';
+import { snailFish } from './snailFish';
 
-describe('day-18', () => {
+describe('snailFish', () => {
   test('should return the expected result', () => {
     const input = [];
-    const result = day-18(input);
+    const result = snailFish(input);
 
     expect(result).toEqual(null);
   });
