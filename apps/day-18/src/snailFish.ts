@@ -1,7 +1,4 @@
-// export type SnailNumber = [number | SnailNumber, number | SnailNumber];
-
 export type RawSnailNumber = [number | RawSnailNumber, number | RawSnailNumber];
-
 class SnailDigit {
   parent: SnailNumber;
   value: number;
@@ -51,17 +48,13 @@ class SnailNumber {
     return [
       this.left.toArray(),
       this.right.toArray(),
-      // this.left instanceof SnailNumber ? this.left.toArray() : this.left,
-      // this.right instanceof SnailNumber ? this.right.toArray() : this.right,
     ];
   }
 }
 
 export const parseNumber = (input: RawSnailNumber) => {
   const root = new SnailNumber(input, 0, null);
-  console.log(JSON.stringify(root.toArray()));
-  // console.log(root.getTails())
-  // console.log(root.getExplodable())
+  // console.log(JSON.stringify(root.toArray()));
   return root;
 };
 
@@ -98,24 +91,6 @@ export const explode = (root: SnailNumber) => {
   }
 
   return root;
-
-  // const tails = root.getTails();
-  // for (let i = 0; i < tails.length; i++) {
-  //   const tail = tails[i];
-  //   if (tail.depth === 5) {
-  //     // before: [[[[[9, 8], 1], 2], 3], 4],
-  //     // after [[[[0, 9], 2], 3], 4],
-  //     // const left = tails?.[i-1]?.value === null ? 0 | tails[i-1].value + tail;
-  //     // const right = tails?.[i-1]?.value;
-
-  //     if (!left) {
-  //       tail.parent;
-  //     }
-  //     break;
-  //   }
-  // }
-
-  return null;
 };
 
 export const snailFish = (input: any[]) => {
