@@ -1,154 +1,123 @@
 // export type SnailNumber = [number | SnailNumber, number | SnailNumber];
 
+export type RawSnailNumber = [number | RawSnailNumber, number | RawSnailNumber];
+
+class SnailDigit {
+  parent: SnailNumber;
+  value: number;
+  constructor(value: number, parent: SnailNumber) {
+    this.parent = parent;
+    this.value = value;
+  }
+
+  getTails() {
+    return [this];
+  }
+
+  toArray() {
+    return this.value;
+  }
+}
 class SnailNumber {
-  left: number | SnailNumber;
-  right: number | SnailNumber;
+  left: SnailNumber | SnailDigit;
+  right: SnailNumber | SnailDigit;
   parent: null | SnailNumber;
   depth: number;
-  constructor(
-    left: number | number[],
-    right: number | number[],
-    depth: number,
-    tails?: Set<SnailNumber>
-  ) {
-    this.left = Array.isArray(left)
-      ? new SnailNumber(left[0], left[1], depth + 1, tails)
-      : left;
-    this.right = Array.isArray(right)
-      ? new SnailNumber(right[0], right[1], depth + 1, tails)
-      : right;
+  constructor(input: RawSnailNumber, depth, parent: null | SnailNumber) {
+    const [left, right] = input;
     this.depth = depth;
-
-    if (this.left instanceof SnailNumber) {
-      this.left.parent = this;
-    }
-    if (this.right instanceof SnailNumber) {
-      this.right.parent = this;
-    }
-
-    if (this.depth === 4) {
-      tails?.add?.(this);
-    }
+    this.parent = parent;
+    this.left = Array.isArray(left)
+      ? new SnailNumber(left, depth + 1, this)
+      : new SnailDigit(left, this);
+    this.right = Array.isArray(right)
+      ? new SnailNumber(right, depth + 1, this)
+      : new SnailDigit(right, this);
   }
 
-  update(left: number | SnailNumber, right: number | SnailNumber) {
-    Object.assign(this, { left, right });
+  getExplodable(): SnailNumber[] {
+    if (this.depth === 4) return [this];
+    return [
+      ...(this.left instanceof SnailNumber ? this.left.getExplodable() : []),
+      ...(this.right instanceof SnailNumber ? this.right.getExplodable() : []),
+    ];
   }
 
-  //[[[[[9,8],1],2],3],4]
-
-  //[]
-  //[[[[9,8],1],2],3] , 4
-  //[[[9,8],1],2], 3
-  //[[9,8],1], 2
-  //[9,8],1
-
-  closest(initialDirection: 'left' | 'right') {
-    let node = this.parent;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let prev: SnailNumber = this;
-    let branch: 'left' | 'right' = initialDirection;
-    // console.log(branch);
-    while (typeof node[branch] !== 'number') {
-      // console.log(node);
-      if (!node.parent && node[branch] === prev) {
-        // console.log('null');
-        return null;
-      }
-
-      if (!node.parent) {
-        branch = initialDirection === 'left' ? 'right' : 'left';
-      }
-
-      if (branch === initialDirection) {
-        prev = node;
-        node = node.parent;
-      } else {
-        prev = node;
-        node = node.left as SnailNumber;
-      }
-    }
-    return node[branch];
-  }
-
-  closestLeft() {
-    // return this.parent.left === this ? null : this.parent.left;
-    return this.closest('left');
-  }
-  closestRight() {
-    return this.closest('right');
-    // let node = this.parent;
-    // let branch: 'left' | 'right' = 'right';
-    // while (typeof node[branch] !== 'number') {
-    //   if (branch === 'right') {
-    //     node = node.parent;
-    //   } else if (branch === 'left') {
-    //     node = node.left as SnailNumber;
-    //   }
-
-    //   if (!node.parent) {
-    //     branch = 'left';
-    //   }
-    // }
-
-    // return node[branch];
-    // let value;
-    // while (typeof value !== "number") {
-    //   if (this.parent && this.parent.right !== this) {
-    //     return this.parent.right;
-    //   }
-    //   else if ()
-    // }
-    // if (!this.parent) {
-
-    // }
-    // else if (this.parent.right === this) {
-    //   this.parent.closestRight
-    // }
-    // else {
-    //   return this.parent.right;
-    // }
-    // return this.parent.right === this ? null : this.parent.right;
+  getTails(): SnailDigit[] {
+    return [...this.left.getTails(), ...this.right.getTails()];
   }
 
   toArray() {
     return [
-      this.left instanceof SnailNumber ? this.left.toArray() : this.left,
-      this.right instanceof SnailNumber ? this.right.toArray() : this.right,
+      this.left.toArray(),
+      this.right.toArray(),
+      // this.left instanceof SnailNumber ? this.left.toArray() : this.left,
+      // this.right instanceof SnailNumber ? this.right.toArray() : this.right,
     ];
   }
 }
-export const parseNumber = (input: Array<number | number[]>) => {
-  const [left, right] = input;
-  const tails = new Set<SnailNumber>();
-  const root = new SnailNumber(left, right, 0, tails);
-  return { root, tails };
+
+export const parseNumber = (input: RawSnailNumber) => {
+  const root = new SnailNumber(input, 0, null);
+  console.log(JSON.stringify(root.toArray()));
+  // console.log(root.getTails())
+  // console.log(root.getExplodable())
+  return root;
 };
 
-export const explode = ({
-  root,
-  tails,
-}: {
-  root: SnailNumber;
-  tails: Set<SnailNumber>;
-}) => {
-  const [tail] = tails;
-  const closestLeft = tail.closestLeft() as number | null;
-  const closestRight = tail.closestRight() as number | null;
-  const left = closestLeft === null ? 0 : closestLeft + (tail.left as number);
-  const right =
-    closestRight === null ? 0 : closestRight + (tail.right as number);
+/**
+ *
+ * To explode a pair, the pair's left value is added to the first regular number to the left
+ * of the exploding pair (if any), and the pair's right value is added
+ * to the first regular number to the right of the exploding pair(if any).
+ * Exploding pairs will always consist of two regular numbers.
+ * Then, the entire exploding pair is replaced with the regular number 0.
+ *
+ */
+export const explode = (root: SnailNumber) => {
+  const explodable = root.getExplodable();
+  const tails = root.getTails();
 
-  console.log({ left, right });
+  const exploding = explodable[0];
+  const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
+  const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
 
-  tail.parent.update(left, right);
+  if (left && exploding.left instanceof SnailDigit) {
+    left.value += exploding.left.value;
+  }
 
-  tails.delete(tail);
+  if (right && exploding.right instanceof SnailDigit) {
+    right.value += exploding.right.value;
+  }
 
-  return { root, tails };
+  if (exploding.parent.left === exploding) {
+    exploding.parent.left = new SnailDigit(0, exploding.parent);
+  }
+  else if (exploding.parent.right === exploding) {
+    exploding.parent.right = new SnailDigit(0, exploding.parent);
+  }
+
+  return root;
+
+  // const tails = root.getTails();
+  // for (let i = 0; i < tails.length; i++) {
+  //   const tail = tails[i];
+  //   if (tail.depth === 5) {
+  //     // before: [[[[[9, 8], 1], 2], 3], 4],
+  //     // after [[[[0, 9], 2], 3], 4],
+  //     // const left = tails?.[i-1]?.value === null ? 0 | tails[i-1].value + tail;
+  //     // const right = tails?.[i-1]?.value;
+
+  //     if (!left) {
+  //       tail.parent;
+  //     }
+  //     break;
+  //   }
+  // }
+
+  return null;
 };
 
 export const snailFish = (input: any[]) => {
-  parseNumber(input);
   return null;
 };
