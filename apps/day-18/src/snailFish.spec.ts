@@ -2,6 +2,7 @@ import {
   snailFish,
   parseNumber,
   RawSnailNumber,
+  SnailNumber,
   explode,
   split,
   add,
@@ -53,7 +54,7 @@ describe('explode', () => {
   );
 });
 
-describe.only('split', () => {
+describe('split', () => {
   test.each([
     [
       [1,[2,[3,[4,11]]]],
@@ -80,15 +81,23 @@ describe.only('split', () => {
 });
 
 describe('add', () => {
-  test.each([
+  const log = (result) => result instanceof SnailNumber ? JSON.stringify(result.toArray()) : JSON.stringify(result);
+
+  test.only.each([
+    // [
+    //   [[[[4,3],4],4],[7,[[8,4],9]]],
+    //   [1,1],
+    //   [[[[0,7],4],[[7,8],[6,0]]],[8,1]]
+    // ],
     [
-      [[[[4,3],4],4],[7,[[8,4],9]]],
-      [1,1],
-      [[[[0,7],4],[[7,8],[6,0]]],[8,1]]
+      [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
+      [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
+      [[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]],
+
     ]
   ] as RawSnailNumber[][])('should add then reduce the given snail numbers', (a,b,expected) => {
     const result = add(a,b);
-    expect(result.toArray()).toEqual(expected);
+    expect(log(result)).toEqual(log(expected));
   })
 })
 
