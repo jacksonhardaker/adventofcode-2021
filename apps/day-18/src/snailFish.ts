@@ -72,25 +72,32 @@ export const parseNumber = (input: RawSnailNumber) => {
  *
  */
 export const explode = (root: SnailNumber) => {
+  const splitable = root.getSplitable();
   const explodable = root.getExplodable();
   const tails = root.getTails();
 
   const exploding = explodable[0];
-  const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
-  const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
-
-  if (left && exploding.left instanceof SnailDigit) {
-    left.value += exploding.left.value;
-  }
-
-  if (right && exploding.right instanceof SnailDigit) {
-    right.value += exploding.right.value;
-  }
-
-  if (exploding.parent.left === exploding) {
-    exploding.parent.left = new SnailDigit(0, exploding.parent);
-  } else if (exploding.parent.right === exploding) {
-    exploding.parent.right = new SnailDigit(0, exploding.parent);
+  if (exploding) {
+    const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
+    const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
+  
+    if (left && exploding.left instanceof SnailDigit) {
+      left.value += exploding.left.value;
+    }
+  
+    if (right && exploding.right instanceof SnailDigit) {
+      right.value += exploding.right.value;
+    }
+  
+    if (exploding.parent.left === exploding) {
+      exploding.parent.left = new SnailDigit(0, exploding.parent);
+    } else if (exploding.parent.right === exploding) {
+      exploding.parent.right = new SnailDigit(0, exploding.parent);
+    }
+  
+    if (splitable.length !== root.getSplitable().length) {
+      split(root);
+    }
   }
 
   return root;
@@ -103,16 +110,23 @@ export const explode = (root: SnailNumber) => {
  * [5,6], 12 becomes [6,6], and so on.
  */
 export const split = (root: SnailNumber) => {
+  const explodable = root.getExplodable();
   const splitting = root.getSplitable()[0];
-  const replacement = new SnailNumber(
-    [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
-    splitting.parent.depth + 1,
-    splitting.parent
-  );
-  if (splitting.parent.left === splitting) {
-    splitting.parent.left = replacement;
-  } else if (splitting.parent.right === splitting) {
-    splitting.parent.right = replacement;
+  if (splitting) {
+    const replacement = new SnailNumber(
+      [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
+      splitting.parent.depth + 1,
+      splitting.parent
+    );
+    if (splitting.parent.left === splitting) {
+      splitting.parent.left = replacement;
+    } else if (splitting.parent.right === splitting) {
+      splitting.parent.right = replacement;
+    }
+  
+    if (explodable.length !== root.getExplodable().length) {
+      explode(root);
+    }
   }
 
   return root;
@@ -122,18 +136,21 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
   const sum: RawSnailNumber = [a, b];
 
   const root = parseNumber(sum);
-  let explodable = root.getExplodable();
-  let splitable = root.getSplitable();
-  while (explodable.length > 0 || splitable.length > 0) {
-    if (explodable[0]) {
-      explode(root);
-    }
-    if (splitable[0]) {
-      split(root);
-    }
+  // let explodable = root.getExplodable();
+  // let splitable = root.getSplitable();
+  while (root.getExplodable().length > 0 || root.getSplitable().length > 0) {
+    explode(root);
+    split(root);
+    // if (explodable[0]) {
+    //   explode(root);
+    //   splitable = root.getSplitable();
+    // }
+    // if (splitable[0]) {
+    //   split(root);
+    // }
 
-    explodable = root.getExplodable();
-    splitable = root.getSplitable();
+    // explodable = root.getExplodable();
+    // splitable = root.getSplitable();
   }
 
   return root;
