@@ -71,7 +71,7 @@ describe('split', () => {
   );
 });
 
-describe.only('add', () => {
+describe('add', () => {
   test.each([
     [
       [[[[4,3],4],4],[7,[[8,4],9]]],
@@ -84,11 +84,43 @@ describe.only('add', () => {
   })
 })
 
-describe.skip('snailFish', () => {
+describe.only('snailFish', () => {
   test('should return the expected result', () => {
-    const input = [[[[[9, 8], 1], 2], 3], 4];
+    const input: RawSnailNumber[] = [
+      [1,1],
+      [2,2],
+      [3,3],
+      [4,4],
+    ];
     const result = snailFish(input);
 
-    expect(result).toEqual(null);
+    expect(result).toEqual([[[[1,1],[2,2]],[3,3]],[4,4]]);
+  });
+
+  test('should return the expected result', () => {
+    const input: RawSnailNumber[] = [
+      [1,1],
+      [2,2],
+      [3,3],
+      [4,4],
+      [5,5],
+    ];
+    const result = snailFish(input);
+
+    expect(result).toEqual([[[[3,0],[5,3]],[4,4]],[5,5]]);
+  });
+
+  test('should return the expected result', () => {
+    const input: RawSnailNumber[] = [
+      [1,1],
+      [2,2],
+      [3,3],
+      [4,4],
+      [5,5],
+      [6,6],
+    ];
+    const result = snailFish(input);
+
+    expect(result).toEqual([[[[5,0],[7,4]],[5,5]],[6,6]]);
   });
 });

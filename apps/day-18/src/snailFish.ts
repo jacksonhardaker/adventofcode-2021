@@ -135,11 +135,15 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
     explodable = root.getExplodable();
     splitable = root.getSplitable();
   }
-  // console.log(JSON.stringify(sum));
-  // console.log(JSON.stringify(root.toArray()));
+
   return root;
 };
 
-export const snailFish = (input: any[]) => {
-  return null;
+export const snailFish = (input: RawSnailNumber[]) => {
+  return input.reduce((acc, num) => {
+    if (!acc) return num;
+
+    const root = add(acc, num);
+    return root.toArray();
+  }, null);
 };
