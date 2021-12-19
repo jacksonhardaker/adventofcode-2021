@@ -71,33 +71,34 @@ export const parseNumber = (input: RawSnailNumber) => {
  * Then, the entire exploding pair is replaced with the regular number 0.
  *
  */
-export const explode = (root: SnailNumber) => {
-  const splitable = root.getSplitable();
+export const explode = (root: SnailNumber, node?: SnailNumber) => {
   const explodable = root.getExplodable();
+  const splitableBefore = root.getSplitable();
   const tails = root.getTails();
 
-  const exploding = explodable[0];
-  if (exploding) {
-    const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
-    const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
+  const exploding = node || explodable[0];
+  const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
+  const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
 
-    if (left && exploding.left instanceof SnailDigit) {
-      left.value += exploding.left.value;
-    }
+  if (left && exploding.left instanceof SnailDigit) {
+    left.value += exploding.left.value;
+  }
 
-    if (right && exploding.right instanceof SnailDigit) {
-      right.value += exploding.right.value;
-    }
+  if (right && exploding.right instanceof SnailDigit) {
+    right.value += exploding.right.value;
+  }
 
-    if (exploding.parent.left === exploding) {
-      exploding.parent.left = new SnailDigit(0, exploding.parent);
-    } else if (exploding.parent.right === exploding) {
-      exploding.parent.right = new SnailDigit(0, exploding.parent);
-    }
+  if (exploding.parent.left === exploding) {
+    exploding.parent.left = new SnailDigit(0, exploding.parent);
+  } else if (exploding.parent.right === exploding) {
+    exploding.parent.right = new SnailDigit(0, exploding.parent);
+  }
 
-    if (splitable.length !== root.getSplitable().length) {
-      split(root);
-    }
+  const splitableAfter = root.getSplitable();
+
+  const [newSplit] = splitableAfter.filter((digit) => !splitableBefore.includes(digit));
+  if (newSplit) {
+    split(root, newSplit);
   }
 
   return root;
@@ -109,24 +110,25 @@ export const explode = (root: SnailNumber) => {
  * the regular number divided by two and rounded up. For example, 10 becomes [5,5], 11 becomes
  * [5,6], 12 becomes [6,6], and so on.
  */
-export const split = (root: SnailNumber) => {
-  const explodable = root.getExplodable();
-  const splitting = root.getSplitable()[0];
-  if (splitting) {
-    const replacement = new SnailNumber(
-      [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
-      splitting.parent.depth + 1,
-      splitting.parent
-    );
-    if (splitting.parent.left === splitting) {
-      splitting.parent.left = replacement;
-    } else if (splitting.parent.right === splitting) {
-      splitting.parent.right = replacement;
-    }
+export const split = (root: SnailNumber, node?: SnailDigit) => {
+  const explodableBefore = root.getExplodable();
+  const splitting = node || root.getSplitable()[0];
 
-    if (explodable.length !== root.getExplodable().length) {
-      explode(root);
-    }
+  const replacement = new SnailNumber(
+    [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
+    splitting.parent.depth + 1,
+    splitting.parent
+  );
+  if (splitting.parent.left === splitting) {
+    splitting.parent.left = replacement;
+  } else if (splitting.parent.right === splitting) {
+    splitting.parent.right = replacement;
+  }
+
+  const explodableAfter = root.getExplodable();
+  const [newExplode] = explodableAfter.filter((digit) => !explodableBefore.includes(digit));
+  if (newExplode) {
+    explode(root, newExplode);
   }
 
   return root;
@@ -136,7 +138,7 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
   const sum: RawSnailNumber = [a, b];
 
   const root = parseNumber(sum);
-  
+
   while (root.getExplodable().length > 0 || root.getSplitable().length > 0) {
     while (root.getExplodable().length > 0) {
       explode(root);
