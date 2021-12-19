@@ -4,6 +4,7 @@ import {
   RawSnailNumber,
   explode,
   split,
+  add,
 } from './snailFish';
 
 describe('explode', () => {
@@ -65,11 +66,23 @@ describe('split', () => {
   ] as RawSnailNumber[][])(
     'should split the snailnumber as expected',
     (input, expected) => {
-      console.log(JSON.stringify(expected));
       expect(split(parseNumber(input)).toArray()).toEqual(expected);
     }
   );
 });
+
+describe.only('add', () => {
+  test.each([
+    [
+      [[[[4,3],4],4],[7,[[8,4],9]]],
+      [1,1],
+      [[[[0,7],4],[[7,8],[6,0]]],[8,1]]
+    ]
+  ] as RawSnailNumber[][])('should add then reduce the given snail numbers', (a,b,expected) => {
+    const result = add(a,b);
+    expect(result.toArray()).toEqual(expected);
+  })
+})
 
 describe.skip('snailFish', () => {
   test('should return the expected result', () => {

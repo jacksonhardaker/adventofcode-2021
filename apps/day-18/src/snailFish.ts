@@ -118,6 +118,28 @@ export const split = (root: SnailNumber) => {
   return root;
 };
 
+export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
+  const sum: RawSnailNumber = [a, b];
+
+  const root = parseNumber(sum);
+  let explodable = root.getExplodable();
+  let splitable = root.getSplitable();
+  while (explodable.length > 0 || splitable.length > 0) {
+    if (explodable[0]) {
+      explode(root);
+    }
+    if (splitable[0]) {
+      split(root);
+    }
+
+    explodable = root.getExplodable();
+    splitable = root.getSplitable();
+  }
+  // console.log(JSON.stringify(sum));
+  // console.log(JSON.stringify(root.toArray()));
+  return root;
+};
+
 export const snailFish = (input: any[]) => {
   return null;
 };
