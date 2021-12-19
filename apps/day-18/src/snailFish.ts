@@ -1,4 +1,6 @@
+import chalk from 'chalk';
 export type RawSnailNumber = [number | RawSnailNumber, number | RawSnailNumber];
+const log = [];
 class SnailDigit {
   parent: SnailNumber;
   value: number;
@@ -52,7 +54,7 @@ export class SnailNumber {
     return [
       ...this.left.getExplodable(),
       ...(this.depth >= 4 ? [this] : []),
-      ...this.right.getExplodable()
+      ...this.right.getExplodable(),
     ];
   }
 
@@ -83,14 +85,17 @@ export const parseNumber = (input: RawSnailNumber) => {
  * Then, the entire exploding pair is replaced with the regular number 0.
  *
  */
-export const explode = (root: SnailNumber, node?: SnailNumber, actions?: (SnailNumber | SnailDigit)[]) => {
+export const explode = (
+  root: SnailNumber,
+  node?: SnailNumber,
+  actions?: (SnailNumber | SnailDigit)[]
+) => {
   const explodable = root.getExplodable();
   const splitableBefore = root.getSplitable();
   const tails = root.getTails();
 
   const exploding = node || explodable[0];
-  console.log(root.toString());
-  console.log('exploding', exploding.toString());
+  log.push(`Exploding ${root.toString().replace(exploding.toString(), chalk.blue(exploding.toString()))} at ${exploding.toString()}`);
   const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
   const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
 
@@ -124,11 +129,14 @@ export const explode = (root: SnailNumber, node?: SnailNumber, actions?: (SnailN
  * the regular number divided by two and rounded up. For example, 10 becomes [5,5], 11 becomes
  * [5,6], 12 becomes [6,6], and so on.
  */
-export const split = (root: SnailNumber, node?: SnailDigit, actions?: (SnailNumber | SnailDigit)[]) => {
+export const split = (
+  root: SnailNumber,
+  node?: SnailDigit,
+  actions?: (SnailNumber | SnailDigit)[]
+) => {
   const explodableBefore = root.getExplodable();
   const splitting = node || root.getSplitable()[0];
-  console.log(root.toString());
-  console.log('splitting', splitting.toString());
+  log.push(`Spliting ${root.toString().replace(splitting.toString(), chalk.blue(splitting.toString()))} at ${splitting.toString()}`);
 
   const replacement = new SnailNumber(
     [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
@@ -154,16 +162,25 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
   const sum: RawSnailNumber = [a, b];
 
   const root = parseNumber(sum);
+  log.push(`Reducing: ${root.toString()}`);
   let instant = [];
   let actions = [...instant, ...root.getExplodable(), ...root.getSplitable()];
 
   while (actions.length > 0) {
-    instant = []
+    instant = [];
     const action = actions.shift();
-    action instanceof SnailNumber ? explode(root, action, instant) : split(root, action, instant);
+    action instanceof SnailNumber
+      ? explode(root, action, instant)
+      : split(root, action, instant);
 
-    actions = [...instant, ...root.getExplodable(), ...root.getSplitable()];
+    actions = [
+      ...instant,
+      ...root.getExplodable(),
+      ...root.getSplitable(),
+    ];
   }
+
+  console.log(log.join('\n'));
 
   return root;
 };
