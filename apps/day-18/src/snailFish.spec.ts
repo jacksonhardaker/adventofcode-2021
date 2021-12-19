@@ -8,6 +8,8 @@ import {
   add,
 } from './snailFish';
 
+const log = (result) => result instanceof SnailNumber ? JSON.stringify(result.toArray()) : JSON.stringify(result);
+
 describe('explode', () => {
   test.each([
     [
@@ -81,7 +83,6 @@ describe('split', () => {
 });
 
 describe('add', () => {
-  const log = (result) => result instanceof SnailNumber ? JSON.stringify(result.toArray()) : JSON.stringify(result);
 
   test.only.each([
     // [
@@ -141,7 +142,7 @@ describe('snailFish', () => {
     expect(result).toEqual([[[[5,0],[7,4]],[5,5]],[6,6]]);
   });
 
-  test('should return the expected result', () => {
+  test.only('should return the expected result', () => {
     const input: RawSnailNumber[] = [
       [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],
       [7,[[[3,7],[4,3]],[[6,3],[8,8]]]],
@@ -156,6 +157,6 @@ describe('snailFish', () => {
     ];
     const result = snailFish(input);
 
-    expect(result).toEqual([[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]);
+    expect(log(result)).toEqual('[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]');
   });
 });

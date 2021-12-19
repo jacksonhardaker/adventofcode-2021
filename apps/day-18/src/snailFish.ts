@@ -15,6 +15,10 @@ class SnailDigit {
     return [this];
   }
 
+  getExplodable() {
+    return [];
+  }
+
   toArray() {
     return this.value;
   }
@@ -45,10 +49,10 @@ export class SnailNumber {
   }
 
   getExplodable(): SnailNumber[] {
-    if (this.depth === 4) return [this];
     return [
-      ...(this.left instanceof SnailNumber ? this.left.getExplodable() : []),
-      ...(this.right instanceof SnailNumber ? this.right.getExplodable() : []),
+      ...this.left.getExplodable(),
+      ...(this.depth >= 4 ? [this] : []),
+      ...this.right.getExplodable()
     ];
   }
 
@@ -150,11 +154,15 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
   const sum: RawSnailNumber = [a, b];
 
   const root = parseNumber(sum);
-  const actions = [...root.getExplodable(), ...root.getSplitable()];
+  let instant = [];
+  let actions = [...instant, ...root.getExplodable(), ...root.getSplitable()];
 
   while (actions.length > 0) {
+    instant = []
     const action = actions.shift();
-    action instanceof SnailNumber ? explode(root, action, actions) : split(root, action, actions);
+    action instanceof SnailNumber ? explode(root, action, instant) : split(root, action, instant);
+
+    actions = [...instant, ...root.getExplodable(), ...root.getSplitable()];
   }
 
   return root;
