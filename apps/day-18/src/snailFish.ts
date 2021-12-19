@@ -7,6 +7,10 @@ class SnailDigit {
     this.value = value;
   }
 
+  getSplitable() {
+    return this.value >= 10 ? [this] : [];
+  }
+
   getTails() {
     return [this];
   }
@@ -32,6 +36,10 @@ class SnailNumber {
       : new SnailDigit(right, this);
   }
 
+  getSplitable(): SnailDigit[] {
+    return [...this.left.getSplitable(), ...this.right.getSplitable()];
+  }
+
   getExplodable(): SnailNumber[] {
     if (this.depth === 4) return [this];
     return [
@@ -45,16 +53,12 @@ class SnailNumber {
   }
 
   toArray() {
-    return [
-      this.left.toArray(),
-      this.right.toArray(),
-    ];
+    return [this.left.toArray(), this.right.toArray()];
   }
 }
 
 export const parseNumber = (input: RawSnailNumber) => {
   const root = new SnailNumber(input, 0, null);
-  // console.log(JSON.stringify(root.toArray()));
   return root;
 };
 
@@ -85,9 +89,30 @@ export const explode = (root: SnailNumber) => {
 
   if (exploding.parent.left === exploding) {
     exploding.parent.left = new SnailDigit(0, exploding.parent);
-  }
-  else if (exploding.parent.right === exploding) {
+  } else if (exploding.parent.right === exploding) {
     exploding.parent.right = new SnailDigit(0, exploding.parent);
+  }
+
+  return root;
+};
+
+/**
+ * To split a regular number, replace it with a pair; the left element of the pair should be the
+ * regular number divided by two and rounded down, while the right element of the pair should be
+ * the regular number divided by two and rounded up. For example, 10 becomes [5,5], 11 becomes
+ * [5,6], 12 becomes [6,6], and so on.
+ */
+export const split = (root: SnailNumber) => {
+  const splitting = root.getSplitable()[0];
+  const replacement = new SnailNumber(
+    [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
+    splitting.parent.depth + 1,
+    splitting.parent
+  );
+  if (splitting.parent.left === splitting) {
+    splitting.parent.left = replacement;
+  } else if (splitting.parent.right === splitting) {
+    splitting.parent.right = replacement;
   }
 
   return root;
