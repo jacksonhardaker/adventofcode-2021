@@ -91,11 +91,17 @@ export const explode = (
   actions?: (SnailNumber | SnailDigit)[]
 ) => {
   const explodable = root.getExplodable();
-  const splitableBefore = root.getSplitable();
   const tails = root.getTails();
 
   const exploding = node || explodable[0];
-  log.push(`Exploding ${root.toString().replace(exploding.toString(), chalk.blue(exploding.toString()))} at ${exploding.toString()}`);
+  log.push(
+    `Exploding ${root
+      .toString()
+      .replace(
+        exploding.toString(),
+        chalk.blue(exploding.toString())
+      )} at ${exploding.toString()}`
+  );
   const left = tails[tails.indexOf(exploding.left as SnailDigit) - 1];
   const right = tails[tails.indexOf(exploding.right as SnailDigit) + 1];
 
@@ -113,12 +119,12 @@ export const explode = (
     exploding.parent.right = new SnailDigit(0, exploding.parent);
   }
 
-  const splitableAfter = root.getSplitable();
-
-  const newSplits = splitableAfter.filter(
-    (digit) => !splitableBefore.includes(digit)
-  );
-  actions.unshift(...newSplits);
+  if (left?.value >= 10) {
+    actions.unshift(left);
+  }
+  if (right?.value >= 10) {
+    actions.unshift(right);
+  }
 
   return root;
 };
@@ -134,9 +140,15 @@ export const split = (
   node?: SnailDigit,
   actions?: (SnailNumber | SnailDigit)[]
 ) => {
-  const explodableBefore = root.getExplodable();
   const splitting = node || root.getSplitable()[0];
-  log.push(`Spliting ${root.toString().replace(splitting.toString(), chalk.blue(splitting.toString()))} at ${splitting.toString()}`);
+  log.push(
+    `Spliting ${root
+      .toString()
+      .replace(
+        splitting.toString(),
+        chalk.blue(splitting.toString())
+      )} at ${splitting.toString()}`
+  );
 
   const replacement = new SnailNumber(
     [Math.floor(splitting.value / 2), Math.ceil(splitting.value / 2)],
@@ -149,11 +161,9 @@ export const split = (
     splitting.parent.right = replacement;
   }
 
-  const explodableAfter = root.getExplodable();
-  const newExplodes = explodableAfter.filter(
-    (digit) => !explodableBefore.includes(digit)
-  );
-  actions.unshift(...newExplodes);
+  if (replacement.depth >= 4) {
+    actions.unshift(replacement);
+  }
 
   return root;
 };
@@ -173,11 +183,7 @@ export const add = (a: RawSnailNumber, b: RawSnailNumber) => {
       ? explode(root, action, instant)
       : split(root, action, instant);
 
-    actions = [
-      ...instant,
-      ...root.getExplodable(),
-      ...root.getSplitable(),
-    ];
+    actions = [...instant, ...root.getExplodable(), ...root.getSplitable()];
   }
 
   console.log(log.join('\n'));
