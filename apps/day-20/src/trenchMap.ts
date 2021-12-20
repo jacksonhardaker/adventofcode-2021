@@ -1,41 +1,45 @@
-type MinMax = {
-  minCol: number;
-  maxCol: number;
-  minRow: number;
-  maxRow: number;
-};
-
 const parseInput = (input: string) => {
   const [algo, rawImg] = input.split('\n\n');
-  const img = rawImg.split('\n').map((row) => Array.from(row));
-  const map = new Set<string>();
-  const minMax: MinMax = {
-    minCol: 0,
-    maxCol: img.length - 1,
-    minRow: 0,
-    maxRow: 0,
-  };
-
-  img.forEach((row, y) => {
-    minMax.maxRow = Math.max(minMax.maxRow, row.length);
-    row.forEach((char, x) => {
-      if (char === '#') {
-        map.add(`${y},${x}`);
-      }
-    });
+  let maxRowLength = 0;
+  const img = rawImg.split('\n').map((row) => {
+    maxRowLength = Math.max(maxRowLength, row.length);
+    return Array.from(row);
   });
 
-  return { algo, map, minMax };
+  const map = [];
+  for (let y = 0; y < img.length; y++) {
+    map.push([]);
+    for (let x = 0; x < maxRowLength; x++) {
+      map[map.length - 1].push(img[y][x]);
+    }
+  }
+
+  return { algo, map };
 };
 
-const enhance = (algo: string, minMax: MinMax, map: Set<string>, iteration: number) => {
-  const enhanced = new Set<string>();
-  const newMinMax = { ...minMax };
+const enhance = (algo, map, itration) => {
+  const emptyChar = algo[0] === '#' ? (itration % 2 === 0 ? '.' : '#') : '.';
+  const maxRow = Math.max(...map.map((m) => m.length)) + 6;
+  const maxCol = map.length + 6;
+  const padded = [
+    Array(maxRow).fill(emptyChar),
+    Array(maxRow).fill(emptyChar),
+    Array(maxRow).fill(emptyChar),
+    ...map.map((r) => [
+      ...Array(3).fill(emptyChar),
+      ...r,
+      ...Array(3).fill(emptyChar),
+    ]),
+    Array(maxRow).fill(emptyChar),
+    Array(maxRow).fill(emptyChar),
+    Array(maxRow).fill(emptyChar),
+  ];
 
-  const char = algo[0] === '#' ? iteration % 2 === 0 ? '#' : '.' : '#';
+  const enhanced = [];
 
-  for (let y = minMax.minCol - 1; y <= minMax.maxCol + 1; y++) {
-    for (let x = minMax.minRow - 1; x <= minMax.maxRow + 1; x++) {
+  for (let y = 2; y < maxCol - 2; y++) {
+    enhanced.push([]);
+    for (let x = 2; x < maxRow - 2; x++) {
       const binary = [
         [y - 1, x - 1],
         [y - 1, x],
@@ -47,58 +51,33 @@ const enhance = (algo: string, minMax: MinMax, map: Set<string>, iteration: numb
         [y + 1, x],
         [y + 1, x + 1],
       ].reduce(
-        (acc, [y2, x2]) => `${acc}${map.has(`${y2},${x2}`) ? '1' :  '0'}`,
+        (acc, [y2, x2]) => `${acc}${padded?.[y2]?.[x2] === '#' ? '1' : '0'}`,
         ''
       );
 
       const index = parseInt(binary, 2);
-      if (algo[index] === char) {
-        enhanced.add(`${y},${x}`);
-        newMinMax.minCol = Math.min(newMinMax.minCol, y);
-        newMinMax.minRow = Math.min(newMinMax.minRow, x);
-        newMinMax.maxCol = Math.max(newMinMax.maxCol, y);
-        newMinMax.maxRow = Math.max(newMinMax.maxRow, x);
+      if (algo[index] === '#') {
+        enhanced[enhanced.length - 1].push('#');
+      } else {
+        enhanced[enhanced.length - 1].push('.');
       }
     }
   }
 
-  return { map: enhanced, minMax: newMinMax };
-};
-
-const print = (map: Set<string>, minMax: MinMax, padding = 3) => {
-  const output = [];
-  for (
-    let y = minMax.minCol + padding * -1;
-    y <= minMax.maxCol + padding;
-    y++
-  ) {
-    output.push('');
-    for (
-      let x = minMax.minRow + padding * -1;
-      x <= minMax.maxRow + padding;
-      x++
-    ) {
-      output[output.length - 1] += map.has(`${y},${x}`) ? '#' : '.';
-    }
-  }
-
-  console.log(output.join('\n'));
+  // console.log(padded.map((m) => m.join('')).join('\n'));
+  // console.log(enhanced.map((m) => m.join('')).join('\n'));
+  return enhanced;
 };
 
 export const trenchMap = (input: string, enhancements = 2) => {
-  const { algo, minMax, map } = parseInput(input);
+  const { algo, map } = parseInput(input);
 
   const result = Array(enhancements)
     .fill(0)
-    .reduce(
-      (acc: { map: Set<string>; minMax: MinMax }, _, i) =>
-        enhance(algo, acc.minMax, acc.map, i),
-      {
-        map,
-        minMax,
-      }
-    );
+    .reduce((acc, _, i) => enhance(algo, acc, i), map);
 
-  // print(result.map, result.minMax);
-  return result.map.size;
+  return result
+    .map((r) => r.join(''))
+    .join('')
+    .match(/#/g).length;
 };
