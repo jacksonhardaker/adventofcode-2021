@@ -1,18 +1,40 @@
-const parseInput = (input: string) => {
-  const [algo, rawImg] = input.split('\n\n');
-
-  const img = rawImg.split('\n').map((row) => Array.from(row));
-
-  return { algo, img };
+type MinMax = {
+  minCol: number;
+  maxCol: number;
+  minRow: number;
+  maxRow: number;
 };
 
-const enhance = (algo: string, img: string[][]) => {
-  const enhanced = [];
-  let litCount = 0;
+const parseInput = (input: string) => {
+  const [algo, rawImg] = input.split('\n\n');
+  const img = rawImg.split('\n').map((row) => Array.from(row));
+  const map = new Set<string>();
+  const minMax: MinMax = {
+    minCol: 0,
+    maxCol: img.length - 1,
+    minRow: 0,
+    maxRow: 0,
+  };
 
-  for (let y = -1; y < img.length + 1; y++) {
-    enhanced.push([]);
-    for (let x = -1; x < img[0].length + 1; x++) {
+  img.forEach((row, y) => {
+    minMax.maxRow = Math.max(minMax.maxRow, row.length);
+    row.forEach((char, x) => {
+      if (char === '#') {
+        map.add(`${y},${x}`);
+      }
+    });
+  });
+
+  return { algo, map, minMax };
+};
+
+const enhance = (algo: string, minMax: MinMax, map: Set<string>) => {
+  const enhanced = new Set<string>();
+  let litCount = 0;
+  const newMinMax = { ...minMax };
+
+  for (let y = minMax.minCol - 1; y <= minMax.maxCol + 1; y++) {
+    for (let x = minMax.minRow - 1; x <= minMax.maxRow + 1; x++) {
       const binary = [
         [y - 1, x - 1],
         [y - 1, x],
@@ -24,26 +46,39 @@ const enhance = (algo: string, img: string[][]) => {
         [y + 1, x],
         [y + 1, x + 1],
       ].reduce(
-        (acc, [y2, x2]) => `${acc}${img?.[y2]?.[x2] === '#' ? '1' : '0'}`,
+        (acc, [y2, x2]) => `${acc}${map.has(`${y2},${x2}`) ? '1' : '0'}`,
         ''
       );
 
       const index = parseInt(binary, 2);
-      enhanced[enhanced.length - 1].push(algo[index]);
-
-      litCount += algo[index] === '#' ? 1 : 0;
+      if (algo[index] === '#') {
+        enhanced.add(`${y},${x}`);
+        litCount++;
+        newMinMax.minCol = Math.min(newMinMax.minCol, y);
+        newMinMax.minRow = Math.min(newMinMax.minRow, x);
+        newMinMax.maxCol = Math.max(newMinMax.maxCol, y);
+        newMinMax.maxRow = Math.max(newMinMax.maxRow, x);
+      }
     }
   }
 
-  return { img: enhanced, litCount };
+  return { map: enhanced, litCount, minMax: newMinMax };
 };
 
-const print = (img: string[][], padding = 3) => {
+const print = (map: Set<string>, minMax: MinMax, padding = 3) => {
   const output = [];
-  for (let y = padding * -1; y < img.length + padding; y++) {
+  for (
+    let y = minMax.minCol + padding * -1;
+    y <= minMax.maxCol + padding;
+    y++
+  ) {
     output.push('');
-    for (let x = padding * -1; x < img[0].length + padding; x++) {
-      output[output.length - 1] += img?.[y]?.[x] ? img[y][x] : '.';
+    for (
+      let x = minMax.minRow + padding * -1;
+      x <= minMax.maxRow + padding;
+      x++
+    ) {
+      output[output.length - 1] += map.has(`${y},${x}`) ? '#' : '.';
     }
   }
 
@@ -51,12 +86,20 @@ const print = (img: string[][], padding = 3) => {
 };
 
 export const trenchMap = (input: string, enhancements = 2) => {
-  const { algo, img } = parseInput(input);
+  const { algo, minMax, map } = parseInput(input);
 
-  const { img: result, litCount } = Array(enhancements)
+  const result = Array(enhancements)
     .fill(0)
-    .reduce((acc) => enhance(algo, acc.img), { img, litCount: 0 });
+    .reduce(
+      (acc: { map: Set<string>; minMax: MinMax; litCount: number }) =>
+        enhance(algo, acc.minMax, acc.map),
+      {
+        map,
+        minMax,
+        litCount: 0,
+      }
+    );
 
-  print(result);
-  return litCount;
+  print(result.map, result.minMax);
+  return result.litCount;
 };
