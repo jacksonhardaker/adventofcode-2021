@@ -13,4 +13,9 @@ describe('trenchMap', () => {
     const result = trenchMap(input);
     expect(result).toEqual(35);
   });
+
+  test('should return the expected result', () => {
+    const result = trenchMap(input, 50);
+    expect(result).toEqual(3351);
+  });
 });
