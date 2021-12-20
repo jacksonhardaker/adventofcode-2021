@@ -28,9 +28,11 @@ const parseInput = (input: string) => {
   return { algo, map, minMax };
 };
 
-const enhance = (algo: string, minMax: MinMax, map: Set<string>) => {
+const enhance = (algo: string, minMax: MinMax, map: Set<string>, iteration: number) => {
   const enhanced = new Set<string>();
   const newMinMax = { ...minMax };
+
+  const char = algo[0] === '#' ? iteration % 2 === 0 ? '#' : '.' : '#';
 
   for (let y = minMax.minCol - 1; y <= minMax.maxCol + 1; y++) {
     for (let x = minMax.minRow - 1; x <= minMax.maxRow + 1; x++) {
@@ -45,12 +47,12 @@ const enhance = (algo: string, minMax: MinMax, map: Set<string>) => {
         [y + 1, x],
         [y + 1, x + 1],
       ].reduce(
-        (acc, [y2, x2]) => `${acc}${map.has(`${y2},${x2}`) ? '1' : '0'}`,
+        (acc, [y2, x2]) => `${acc}${map.has(`${y2},${x2}`) ? '1' :  '0'}`,
         ''
       );
 
       const index = parseInt(binary, 2);
-      if (algo[index] === '#') {
+      if (algo[index] === char) {
         enhanced.add(`${y},${x}`);
         newMinMax.minCol = Math.min(newMinMax.minCol, y);
         newMinMax.minRow = Math.min(newMinMax.minRow, x);
@@ -89,14 +91,14 @@ export const trenchMap = (input: string, enhancements = 2) => {
   const result = Array(enhancements)
     .fill(0)
     .reduce(
-      (acc: { map: Set<string>; minMax: MinMax }) =>
-        enhance(algo, acc.minMax, acc.map),
+      (acc: { map: Set<string>; minMax: MinMax }, _, i) =>
+        enhance(algo, acc.minMax, acc.map, i),
       {
         map,
         minMax,
       }
     );
 
-  print(result.map, result.minMax);
+  // print(result.map, result.minMax);
   return result.map.size;
 };
