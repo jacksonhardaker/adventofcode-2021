@@ -17,24 +17,18 @@ const parseInput = (input: string) => {
   return { algo, map };
 };
 
+const pad = (n, c) => Array(n).fill(c);
+const padMap = (n, c) => Array(n).fill(0).map(c);
+
 const enhance = (algo, map, itration) => {
   const emptyChar = algo[0] === '#' ? (itration % 2 === 0 ? '.' : '#') : '.';
   const maxRow = Math.max(...map.map((m) => m.length)) + 6;
   const maxCol = map.length + 6;
-  const padded = [
-    Array(maxRow).fill(emptyChar),
-    Array(maxRow).fill(emptyChar),
-    Array(maxRow).fill(emptyChar),
-    ...map.map((r) => [
-      ...Array(3).fill(emptyChar),
-      ...r,
-      ...Array(3).fill(emptyChar),
-    ]),
-    Array(maxRow).fill(emptyChar),
-    Array(maxRow).fill(emptyChar),
-    Array(maxRow).fill(emptyChar),
-  ];
-
+  const padded = [].concat(
+    padMap(3, () => pad(maxRow, emptyChar)),
+    map.map((r) => [].concat(pad(3, emptyChar), r, pad(3, emptyChar))),
+    padMap(3, () => pad(maxRow, emptyChar))
+  );
   const enhanced = [];
 
   for (let y = 2; y < maxCol - 2; y++) {
@@ -55,17 +49,10 @@ const enhance = (algo, map, itration) => {
         ''
       );
 
-      const index = parseInt(binary, 2);
-      if (algo[index] === '#') {
-        enhanced[enhanced.length - 1].push('#');
-      } else {
-        enhanced[enhanced.length - 1].push('.');
-      }
+      enhanced[enhanced.length - 1].push(algo[parseInt(binary, 2)]);
     }
   }
 
-  // console.log(padded.map((m) => m.join('')).join('\n'));
-  // console.log(enhanced.map((m) => m.join('')).join('\n'));
   return enhanced;
 };
 
