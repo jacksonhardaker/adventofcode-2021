@@ -46,3 +46,19 @@ export const diracDice = (input: string[]) => {
 
   return Math.min(scores.p1, scores.p2) * rolls;
 };
+
+export const quantumDie = (input: string[]) => {
+  const [p1Start, p2Start] = parseInput(input);
+  const wins = { p1: 0, p2: 0 };
+
+  const recursive = (
+    scores: { p1: number; p2: number },
+    pos: { p1: number; p2: number },
+    turn: 'p1' | 'p2',
+    rolls: number
+  ) => {
+    //
+  };
+
+  recursive({ p1: 0, p2: 0 }, { p1: p1Start, p2: p2Start }, 'p1', 0);
+};
